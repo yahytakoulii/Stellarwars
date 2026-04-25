@@ -47,8 +47,10 @@ int init_minimap(Minimap *m, const char *path, int sw, int sh, int bw, int bh) {
     int map_h = tH;
     int margin = MINIMAP_MARGIN;
 
+
     int calc_x = 0;
     int calc_y = 0;
+    
     calc_x = screen_w - map_w - margin;
     calc_y = margin;
 
@@ -124,6 +126,7 @@ void update_minimap(Minimap *m, SDL_Rect playerPos, SDL_Rect cam) {
     int bounds_h = 0;
     bounds_w = m->pos.w - m->posMan.w;
     bounds_h = m->pos.h - m->posMan.h;
+
 
     if (map_internal_x < 0) {
         map_internal_x = 0;
