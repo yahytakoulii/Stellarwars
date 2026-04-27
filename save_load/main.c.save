@@ -1,0 +1,52 @@
+#include <SDL2/SDL.h>
+#include <stdio.h>
+typedef enum {
+    MAIN_MENU,
+    SAVE_LOAD_MENU,
+    PLAYER_MENU
+} GameState;
+
+GameState currentState = SAVE_LOAD_MENU;
+
+typedef struct {
+    SDL_Rect rect;
+    int hovered;
+} Button;
+
+int main()
+{
+    if(SDL_Init(SDL_INIT_VIDEO) != 0)
+    {
+        printf("SDL Init Error\n");
+        return 1;
+    }
+
+    SDL_Window *window = SDL_CreateWindow("Game",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        800, 600, 0);
+
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+
+    int running = 1;
+    SDL_Event event;
+
+    while(running)
+    {
+        while(SDL_PollEvent(&event))
+        {
+            if(event.type == SDL_QUIT)
+                running = 0;
+        }
+
+        SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
+    }
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    return 0;
+}
+
