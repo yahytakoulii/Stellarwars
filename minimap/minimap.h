@@ -1,7 +1,7 @@
 #ifndef MINIMAP_H
 #define MINIMAP_H
 #include <SDL2/SDL.h>
-#define MAX_ENEMIES 5
+#define MAX_ENEMIES 7
 #define MINIMAP_MARGIN 25
 #define PLAYER_DOT_SIZE 8
 

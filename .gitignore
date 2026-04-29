@@ -1,0 +1,7 @@
+*.o
+
+/game
+/prog
+/minimap/space
+/puzzle_game/puzzle
+/save_load/game

@@ -1,0 +1,457 @@
+#include "header.h"
+
+static int chargerAnimation(Animation *anim, SDL_Renderer *renderer,
+                            const char *path, int rows, int cols)
+{
+    SDL_Surface *surf;
+    int texW;
+    int texH;
+
+    surf = IMG_Load(path);
+    if (surf == NULL)
+    {
+        printf("[ERREUR] IMG_Load(\"%s\") : %s\n", path, IMG_GetError());
+        return 0;
+    }
+
+    anim->texture = SDL_CreateTextureFromSurface(renderer, surf);
+    SDL_FreeSurface(surf);
+
+    if (anim->texture == NULL)
+    {
+        printf("[ERREUR] SDL_CreateTextureFromSurface(\"%s\") : %s\n", path, SDL_GetError());
+        return 0;
+    }
+
+    SDL_QueryTexture(anim->texture, NULL, NULL, &texW, &texH);
+    anim->rows = rows;
+    anim->cols = cols;
+    anim->frameW = texW / cols;
+    anim->frameH = texH / rows;
+
+    return 1;
+}
+
+static void libererAnimation(Animation *anim)
+{
+    if (anim->texture != NULL)
+    {
+        SDL_DestroyTexture(anim->texture);
+        anim->texture = NULL;
+    }
+}
+
+static Animation *getCurrentAnimation(Joueur *J)
+{
+    switch (J->state)
+    {
+        case STATE_JUMP:
+            return &J->jump;
+        case STATE_FIRE:
+            return &J->fire;
+        case STATE_DIE:
+            return &J->die;
+        case STATE_IDLE:
+        case STATE_WALK:
+        default:
+            return &J->walk;
+    }
+}
+
+static void setPlayerState(Joueur *J, PlayerState state)
+{
+    if (J->state != state)
+    {
+        J->state = state;
+        J->currentFrame = 0;
+        J->lastFrameTime = 0;
+    }
+
+    switch (state)
+    {
+        case STATE_IDLE:
+            J->frameDelay = 160;
+            J->currentFrame = 0;
+            break;
+        case STATE_WALK:
+            J->frameDelay = 1600;
+            break;
+        case STATE_JUMP:
+            J->frameDelay = 140;
+            break;
+        case STATE_FIRE:
+            J->frameDelay = 130;
+            break;
+        case STATE_DIE:
+            J->frameDelay = 170;
+            break;
+    }
+}
+
+int initialiserJoueur(Joueur *J, SDL_Renderer *renderer, int x, int y)
+{
+    memset(J, 0, sizeof(Joueur));
+
+    if (!chargerAnimation(&J->walk, renderer, "assets_pluto/walk.png", PLUTO_WALK_ROWS, PLUTO_WALK_COLS))
+        return 0;
+
+    if (!chargerAnimation(&J->jump, renderer, "assets_pluto/jump.png", PLUTO_JUMP_ROWS, PLUTO_JUMP_COLS))
+        return 0;
+
+    if (!chargerAnimation(&J->fire, renderer, "assets_pluto/fire.png", PLUTO_FIRE_ROWS, PLUTO_FIRE_COLS))
+        return 0;
+
+    if (!chargerAnimation(&J->die, renderer, "assets_pluto/die.png", PLUTO_DIE_ROWS, PLUTO_DIE_COLS))
+        return 0;
+
+    J->posScreen.x = x;
+    J->posScreen.y = y;
+    J->posScreen.w = PLAYER_W;
+    J->posScreen.h = PLAYER_H;
+
+    J->startX = x;
+    J->startY = y;
+    J->floorY = GROUND_Y;
+    J->posYFloat = (float)y;
+
+    J->score = 0;
+    J->vies = PLAYER_LIVES;
+    J->health = PLAYER_HEALTH_MAX;
+    J->alive = 1;
+    J->visible = 1;
+    J->facing = FACE_RIGHT;
+    J->isJumping = 0;
+    J->jumpsUsed = 0;
+    J->jumpHeld = 0;
+    J->velY = 0.0f;
+    J->lastShotTime = 0;
+    J->invulnerableUntil = 0;
+    J->deathTime = 0;
+
+    setPlayerState(J, STATE_IDLE);
+    return 1;
+}
+
+void libererJoueur(Joueur *J)
+{
+    libererAnimation(&J->walk);
+    libererAnimation(&J->jump);
+    libererAnimation(&J->fire);
+    libererAnimation(&J->die);
+}
+
+void gererEntreeJoueurClavier(Joueur *J, const Uint8 *keys,
+                              SDL_Scancode left, SDL_Scancode right,
+                              SDL_Scancode jumpKey)
+{
+    if (!J->alive || !J->visible)
+        return;
+
+    J->moveLeft = 0;
+    J->moveRight = 0;
+
+    if ((keys[left] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_A]) &&
+        !(keys[right] || keys[SDL_SCANCODE_D]))
+    {
+        J->moveLeft = 1;
+        J->facing = FACE_LEFT;
+    }
+    else if ((keys[right] || keys[SDL_SCANCODE_D]) &&
+             !(keys[left] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_A]))
+    {
+        J->moveRight = 1;
+        J->facing = FACE_RIGHT;
+    }
+
+    if ((keys[jumpKey] || keys[SDL_SCANCODE_Z]) && !J->jumpHeld)
+    {
+        lancerSaut(J);
+        J->jumpHeld = 1;
+    }
+    else if (!keys[jumpKey] && !keys[SDL_SCANCODE_Z])
+        J->jumpHeld = 0;
+}
+
+void lancerSaut(Joueur *J)
+{
+    if (!J->alive || J->jumpsUsed >= 2)
+        return;
+
+    J->isJumping = 1;
+    J->jumpsUsed++;
+    J->velY = -18.0f;
+    setPlayerState(J, STATE_JUMP);
+}
+
+void updateJoueur(Joueur *J, Uint32 now)
+{
+    Animation *anim;
+
+    if (!J->alive)
+        setPlayerState(J, STATE_DIE);
+
+    if (J->alive)
+    {
+        if (J->moveLeft)
+            J->posScreen.x -= PLAYER_SPEED;
+        else if (J->moveRight)
+            J->posScreen.x += PLAYER_SPEED;
+
+        if (J->posScreen.x < 0)
+            J->posScreen.x = 0;
+
+        if (J->posScreen.x + J->posScreen.w > WORLD_W)
+            J->posScreen.x = WORLD_W - J->posScreen.w;
+
+        if (J->isJumping)
+        {
+            J->velY += 0.7f;
+            J->posYFloat += J->velY;
+            J->posScreen.y = (int)J->posYFloat;
+
+            if (J->posScreen.y >= J->floorY)
+            {
+                J->posScreen.y = J->floorY;
+                J->posYFloat = (float)J->floorY;
+                J->velY = 0.0f;
+                J->isJumping = 0;
+                J->jumpsUsed = 0;
+
+                if (J->state != STATE_FIRE)
+                {
+                    if (J->moveLeft || J->moveRight)
+                        setPlayerState(J, STATE_WALK);
+                    else
+                        setPlayerState(J, STATE_IDLE);
+                }
+            }
+        }
+        else
+        {
+            J->posScreen.y = J->floorY;
+            J->posYFloat = (float)J->floorY;
+
+            if (J->state != STATE_FIRE)
+            {
+                if (J->moveLeft || J->moveRight)
+                    setPlayerState(J, STATE_WALK);
+                else
+                    setPlayerState(J, STATE_IDLE);
+            }
+        }
+    }
+
+    anim = getCurrentAnimation(J);
+
+    if (J->state == STATE_IDLE)
+        J->currentFrame = 0;
+    else if (now - J->lastFrameTime >= J->frameDelay)
+    {
+        J->lastFrameTime = now;
+        J->currentFrame++;
+
+        if (J->currentFrame >= anim->cols)
+        {
+            if (J->state == STATE_FIRE)
+            {
+                J->currentFrame = 0;
+
+                if (J->alive && !J->isJumping)
+                {
+                    if (J->moveLeft || J->moveRight)
+                        setPlayerState(J, STATE_WALK);
+                    else
+                        setPlayerState(J, STATE_IDLE);
+                }
+            }
+            else if (J->state == STATE_DIE)
+            {
+                J->currentFrame = anim->cols - 1;
+                if (J->vies > 0 && now - J->deathTime >= PLAYER_RESPAWN_DELAY)
+                    respawnJoueur(J);
+            }
+            else
+                J->currentFrame = 0;
+        }
+    }
+
+    anim = getCurrentAnimation(J);
+    J->posSprite.w = anim->frameW;
+    J->posSprite.h = anim->frameH;
+    J->posSprite.x = J->currentFrame * anim->frameW;
+    J->posSprite.y = J->facing * anim->frameH;
+}
+
+void renderJoueur(SDL_Renderer *renderer, Joueur *J)
+{
+    Animation *anim;
+    SDL_Rect drawRect;
+
+    if (!J->visible)
+        return;
+
+    anim = getCurrentAnimation(J);
+    if (anim == NULL || anim->texture == NULL)
+        return;
+
+    drawRect = J->posScreen;
+    drawRect.y = J->posScreen.y + J->posScreen.h - drawRect.h;
+    SDL_RenderCopy(renderer, anim->texture, &J->posSprite, &drawRect);
+}
+
+void reinitialiserPositionJoueur(Joueur *J)
+{
+    J->posScreen.x = J->startX;
+    J->posScreen.y = J->startY;
+    J->posYFloat = (float)J->startY;
+    J->floorY = GROUND_Y;
+    J->moveLeft = 0;
+    J->moveRight = 0;
+    J->isJumping = 0;
+    J->jumpsUsed = 0;
+    J->jumpHeld = 0;
+    J->velY = 0.0f;
+    setPlayerState(J, STATE_IDLE);
+}
+
+void respawnJoueur(Joueur *J)
+{
+    reinitialiserPositionJoueur(J);
+    J->health = PLAYER_HEALTH_MAX;
+    J->alive = 1;
+    J->invulnerableUntil = SDL_GetTicks() + PLAYER_DAMAGE_COOLDOWN;
+    J->deathTime = 0;
+}
+
+void appliquerDegatsJoueur(Joueur *J, int damage, Uint32 now)
+{
+    if (!J->alive || !J->visible || J->vies <= 0)
+        return;
+
+    if (now < J->invulnerableUntil)
+        return;
+
+    J->health -= damage;
+    J->invulnerableUntil = now + PLAYER_DAMAGE_COOLDOWN;
+
+    if (J->health <= 0)
+    {
+        J->health = 0;
+        J->vies--;
+        if (J->vies < 0)
+            J->vies = 0;
+        J->alive = 0;
+        J->moveLeft = 0;
+        J->moveRight = 0;
+        J->isJumping = 0;
+        J->jumpsUsed = 0;
+        J->velY = 0.0f;
+        J->deathTime = now;
+        setPlayerState(J, STATE_DIE);
+    }
+}
+
+void ajouterScoreJoueur(Joueur *J, int delta)
+{
+    J->score += delta;
+
+    if (J->score < 0)
+        J->score = 0;
+}
+
+void initBullets(Bullet bullets[], int size)
+{
+    int i;
+
+    for (i = 0; i < size; i++)
+        bullets[i].active = 0;
+}
+
+void effacerBullets(Bullet bullets[], int size)
+{
+    int i;
+
+    for (i = 0; i < size; i++)
+        bullets[i].active = 0;
+}
+
+void tirerBullet(Bullet bullets[], int size, Joueur *shooter, int owner, Uint32 now)
+{
+    int i;
+
+    if (!shooter->alive || !shooter->visible)
+        return;
+
+    if (now - shooter->lastShotTime < FIRE_COOLDOWN)
+        return;
+
+    shooter->lastShotTime = now;
+    setPlayerState(shooter, STATE_FIRE);
+
+    for (i = 0; i < size; i++)
+    {
+        if (!bullets[i].active)
+        {
+            bullets[i].active = 1;
+            bullets[i].direction = shooter->facing;
+            bullets[i].owner = owner;
+            bullets[i].rect.w = BULLET_W;
+            bullets[i].rect.h = BULLET_H;
+            bullets[i].rect.y = shooter->posScreen.y + shooter->posScreen.h / 2;
+
+            if (shooter->facing == FACE_RIGHT)
+                bullets[i].rect.x = shooter->posScreen.x + shooter->posScreen.w - 5;
+            else
+                bullets[i].rect.x = shooter->posScreen.x - BULLET_W + 5;
+
+            return;
+        }
+    }
+}
+
+void updateBullets(Bullet bullets[], int size)
+{
+    int i;
+
+    for (i = 0; i < size; i++)
+    {
+        if (!bullets[i].active)
+            continue;
+
+        if (bullets[i].direction == FACE_RIGHT)
+            bullets[i].rect.x += BULLET_SPEED;
+        else
+            bullets[i].rect.x -= BULLET_SPEED;
+
+        if (bullets[i].rect.x > WORLD_W || bullets[i].rect.x + bullets[i].rect.w < 0)
+            bullets[i].active = 0;
+    }
+}
+
+void renderBullets(SDL_Renderer *renderer, Bullet bullets[], int size)
+{
+    int i;
+    SDL_Rect flash;
+
+    SDL_SetRenderDrawColor(renderer, 255, 220, 50, 255);
+
+    for (i = 0; i < size; i++)
+    {
+        if (!bullets[i].active)
+            continue;
+
+        SDL_RenderFillRect(renderer, &bullets[i].rect);
+
+        flash = bullets[i].rect;
+        flash.w = 4;
+        flash.h = 10;
+        flash.y -= 2;
+
+        if (bullets[i].direction == FACE_RIGHT)
+            flash.x = bullets[i].rect.x + bullets[i].rect.w;
+        else
+            flash.x = bullets[i].rect.x - 4;
+
+        SDL_RenderFillRect(renderer, &flash);
+    }
+}

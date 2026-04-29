@@ -1,6 +1,8 @@
 #include "minimap.h"
 
 int init_minimap(Minimap *m, const char *path, int sw, int sh, int bw, int bh) {
+    (void)sh;
+
     if (m == NULL) {
         return -1;
     }
@@ -42,7 +44,6 @@ int init_minimap(Minimap *m, const char *path, int sw, int sh, int bw, int bh) {
     }
 
     int screen_w = sw;
-    int screen_h = sh;
     int map_w = tW;
     int map_h = tH;
     int margin = MINIMAP_MARGIN;
@@ -274,9 +275,6 @@ int check_collision_aabb(SDL_Rect a, SDL_Rect b) {
     int x2_b = b.x + b.w;
     int y1_b = b.y;
     int y2_b = b.y + b.h;
-
-    int collision_v = 0;
-    int collision_h = 0;
 
     if (y2_a <= y1_b) {
         return 0;
