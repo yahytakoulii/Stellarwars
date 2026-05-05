@@ -1,3 +1,14 @@
+/**
+* @file background.h
+* @brief Header file for background, platforms, timer, guide, and buttons.
+* @author C Team
+* @version 0.1
+* @date May 02, 2026
+*
+* This file contains the structures and function prototypes used for
+* rendering and controlling the scrolling background module.
+*/
+
 #ifndef BACKGROUND_H
 #define BACKGROUND_H
 
@@ -19,43 +30,64 @@
 #define MODE_SPLIT  0
 #define MODE_SINGLE 1
 
+/**
+* @struct Platform
+* @brief struct for a platform.
+*/
 typedef struct {
-    SDL_Rect rect;
-    int type;
-    int dx;
-    int alive;
+    SDL_Rect rect; /*!< Rectangle of the platform. */
+    int type; /*!< Platform type. */
+    int dx; /*!< Horizontal movement speed. */
+    int alive; /*!< Active state of the platform. */
 } Platform;
 
+/**
+* @struct Background
+* @brief struct for background.
+*/
 typedef struct {
-    SDL_Texture *image;
-    int imgW, imgH;
-    SDL_Rect posBack1;
-    SDL_Rect posBack2;
-    SDL_Rect posScreen1;
-    SDL_Rect posScreen2;
-    Platform platforms[MAX_PLATFORMS];
-    int platformCount;
-    int level;
-    int screenMode;   /* MODE_SPLIT or MODE_SINGLE */
+    SDL_Texture *image; /*!< Background texture. */
+    int imgW; /*!< Background image width. */
+    int imgH; /*!< Background image height. */
+    SDL_Rect posBack1; /*!< Source rectangle for the first background camera. */
+    SDL_Rect posBack2; /*!< Source rectangle for the second background camera. */
+    SDL_Rect posScreen1; /*!< Destination rectangle for the first screen viewport. */
+    SDL_Rect posScreen2; /*!< Destination rectangle for the second screen viewport. */
+    Platform platforms[MAX_PLATFORMS]; /*!< Array of platforms. */
+    int platformCount; /*!< Number of platforms. */
+    int level; /*!< Current level number. */
+    int screenMode; /*!< MODE_SPLIT or MODE_SINGLE. */
 } Background;
 
+/**
+* @struct GameTimer
+* @brief struct for a game timer.
+*/
 typedef struct {
-    Uint32 startTime;
-    Uint32 elapsed;
+    Uint32 startTime; /*!< Timer start time. */
+    Uint32 elapsed; /*!< Elapsed time. */
 } GameTimer;
 
 #define GUIDE_MAX_LINES 20
 
+/**
+* @struct Guide
+* @brief struct for the help guide.
+*/
 typedef struct {
-    int visible;
-    char lines[GUIDE_MAX_LINES][120];
-    int lineCount;
+    int visible; /*!< Guide visibility state. */
+    char lines[GUIDE_MAX_LINES][120]; /*!< Guide text lines. */
+    int lineCount; /*!< Number of guide lines. */
 } Guide;
 
+/**
+* @struct Button
+* @brief struct for a graphical button.
+*/
 typedef struct {
-    SDL_Rect      pos;
-    SDL_Texture  *texture;
-    int           hovered;
+    SDL_Rect      pos; /*!< Button position. */
+    SDL_Texture  *texture; /*!< Button texture. */
+    int           hovered; /*!< Hover state of the button. */
 } Button;
 
 /* Background */

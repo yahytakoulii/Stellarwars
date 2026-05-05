@@ -1,7 +1,28 @@
+/**
+* @file main.c
+* @brief Main program for the Pfinal SDL game.
+* @author C Team
+* @version 0.1
+* @date May 02, 2026
+*
+* Main program for player control, scrolling world rendering, enemies,
+* minimap display, puzzle challenge, and highscore screen.
+*/
+
 #include "header.h"
 #include "highscore.h"
 #include "minimap/minimap.h"
+#include "save_system.h"
 
+/**
+* @brief To show the player heads-up display.
+* @param renderer the SDL renderer
+* @param font the font used for the score text
+* @param J1 the first player
+* @param J2 the second player
+* @param joueurActif the active player number
+* @return Nothing
+*/
 static void afficherHUD(SDL_Renderer *renderer, TTF_Font *font,
                         Joueur *J1, Joueur *J2, int joueurActif)
 {
@@ -67,6 +88,10 @@ static void afficherHUD(SDL_Renderer *renderer, TTF_Font *font,
     }
 }
 
+/**
+* @brief To launch the puzzle challenge.
+* @return 1 if the challenge is won, 0 otherwise
+*/
 static int lancerChallengePuzzle(void)
 {
     int round;
@@ -79,6 +104,194 @@ static int lancerChallengePuzzle(void)
     return wins >= PUZZLE_CHALLENGE_REQUIRED;
 }
 
+/**
+* @brief To save the current game progress.
+* @param J1 the first player
+* @param J2 the second player
+* @param bullets the bullets
+* @param npcs the enemies
+* @param stablePlatforms the stable platforms
+* @param movingPlatforms the moving platforms
+* @param movingDir the moving platform directions
+* @param movingMin the moving platform minimum positions
+* @param movingMax the moving platform maximum positions
+* @param joueurActif the active player number
+* @param puzzleChallengeUsed the puzzle challenge state
+* @return 1 if the save succeeds, 0 otherwise
+*/
+static int sauvegarderProgression(Joueur *J1, Joueur *J2,
+                                  Bullet bullets[], NPC npcs[],
+                                  SDL_Rect stablePlatforms[],
+                                  SDL_Rect movingPlatforms[],
+                                  int movingDir[], int movingMin[], int movingMax[],
+                                  int joueurActif, int puzzleChallengeUsed,
+                                  SDL_Renderer *renderer, TTF_Font *font)
+{
+    char savePath[SAVE_PATH_MAX];
+    char saveName[64];
+
+    if (!prompt_save_name(renderer, font, saveName, sizeof(saveName)))
+        return 0;
+
+    if (!make_save_path(savePath, sizeof(savePath), saveName))
+        return 0;
+
+    return save_game_state(savePath,
+                           J1, J2,
+                           bullets, MAX_BULLETS,
+                           npcs, MAX_NPCS,
+                           stablePlatforms, STABLE_PLATFORM_COUNT,
+                           movingPlatforms, MOVING_PLATFORM_COUNT,
+                           movingDir, movingMin, movingMax,
+                           joueurActif, puzzleChallengeUsed);
+}
+
+/**
+* @brief To check horizontal overlap between a player and a platform.
+* @param player the player rectangle
+* @param platform the platform rectangle
+* @return 1 if the rectangles overlap horizontally, 0 otherwise
+*/
+static int chevaucheHorizontalement(SDL_Rect player, SDL_Rect platform)
+{
+    return player.x + player.w > platform.x && player.x < platform.x + platform.w;
+}
+
+/**
+* @brief To stop the player from crossing a platform from below.
+* @param J the player
+* @param previous the player rectangle before the movement update
+* @param platform the platform rectangle
+* @return Nothing
+*/
+static void bloquerDessousPlateforme(Joueur *J, SDL_Rect previous, SDL_Rect platform)
+{
+    int platformBottom = platform.y + platform.h;
+
+    if (!J->alive || !J->isJumping || J->velY >= 0.0f)
+        return;
+
+    if (!chevaucheHorizontalement(J->posScreen, platform))
+        return;
+
+    if (previous.y >= platformBottom && J->posScreen.y < platformBottom)
+    {
+        J->posScreen.y = platformBottom;
+        J->posYFloat = (float)platformBottom;
+        J->velY = 0.0f;
+    }
+}
+
+/**
+* @brief To apply platform underside collision to the player.
+* @param J the player
+* @param previous the player rectangle before the movement update
+* @param stablePlatforms the stable platforms
+* @param movingPlatforms the moving platforms
+* @return Nothing
+*/
+static void appliquerCollisionDessousPlateformes(Joueur *J, SDL_Rect previous,
+                                                 SDL_Rect stablePlatforms[],
+                                                 SDL_Rect movingPlatforms[])
+{
+    int p;
+
+    for (p = 0; p < STABLE_PLATFORM_COUNT; p++)
+        bloquerDessousPlateforme(J, previous, stablePlatforms[p]);
+
+    for (p = 0; p < MOVING_PLATFORM_COUNT; p++)
+        bloquerDessousPlateforme(J, previous, movingPlatforms[p]);
+}
+
+/**
+* @brief To draw the debug rectangles for player and platforms.
+* @param renderer the SDL renderer
+* @param J1 the first player
+* @param J2 the second player
+* @param cameraX the camera horizontal offset
+* @param shipGround the ship ground collision rectangle
+* @param marsGround the Mars ground collision rectangle
+* @param stablePlatforms the stable platform collision rectangles
+* @param movingPlatforms the moving platform collision rectangles
+* @return Nothing
+*/
+static void afficherDebugCollision(SDL_Renderer *renderer,
+                                   Joueur *J1, Joueur *J2,
+                                   int cameraX,
+                                   SDL_Rect shipGround, SDL_Rect marsGround,
+                                   SDL_Rect stablePlatforms[],
+                                   SDL_Rect movingPlatforms[])
+{
+    SDL_Rect r;
+    SDL_Rect draw;
+    Joueur temp;
+    int p;
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+    r = shipGround;
+    r.x -= cameraX;
+    SDL_SetRenderDrawColor(renderer, 255, 220, 0, 190);
+    SDL_RenderDrawRect(renderer, &r);
+    SDL_RenderDrawLine(renderer, r.x, r.y, r.x + r.w, r.y);
+
+    r = marsGround;
+    r.x -= cameraX;
+    SDL_SetRenderDrawColor(renderer, 255, 180, 0, 190);
+    SDL_RenderDrawRect(renderer, &r);
+    SDL_RenderDrawLine(renderer, r.x, r.y, r.x + r.w, r.y);
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 190);
+    for (p = 0; p < STABLE_PLATFORM_COUNT; p++)
+    {
+        r = stablePlatforms[p];
+        r.x -= cameraX;
+        SDL_RenderDrawRect(renderer, &r);
+        SDL_RenderDrawLine(renderer, r.x, r.y, r.x + r.w, r.y);
+    }
+
+    SDL_SetRenderDrawColor(renderer, 0, 255, 255, 190);
+    for (p = 0; p < MOVING_PLATFORM_COUNT; p++)
+    {
+        r = movingPlatforms[p];
+        r.x -= cameraX;
+        SDL_RenderDrawRect(renderer, &r);
+        SDL_RenderDrawLine(renderer, r.x, r.y, r.x + r.w, r.y);
+    }
+
+    temp = *J1;
+    temp.posScreen.x -= cameraX;
+    draw = getJoueurDrawRect(&temp);
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 220);
+    SDL_RenderDrawRect(renderer, &temp.posScreen);
+    SDL_SetRenderDrawColor(renderer, 80, 160, 255, 220);
+    SDL_RenderDrawRect(renderer, &draw);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 240);
+    SDL_RenderDrawLine(renderer, temp.posScreen.x,
+                       temp.posScreen.y + temp.posScreen.h,
+                       temp.posScreen.x + temp.posScreen.w,
+                       temp.posScreen.y + temp.posScreen.h);
+
+    temp = *J2;
+    temp.posScreen.x -= cameraX;
+    draw = getJoueurDrawRect(&temp);
+    SDL_SetRenderDrawColor(renderer, 0, 210, 0, 180);
+    SDL_RenderDrawRect(renderer, &temp.posScreen);
+    SDL_SetRenderDrawColor(renderer, 80, 130, 255, 180);
+    SDL_RenderDrawRect(renderer, &draw);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 220);
+    SDL_RenderDrawLine(renderer, temp.posScreen.x,
+                       temp.posScreen.y + temp.posScreen.h,
+                       temp.posScreen.x + temp.posScreen.w,
+                       temp.posScreen.y + temp.posScreen.h);
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+}
+
+/**
+* @brief Main entry point of the SDL game.
+* @return 0 when the game closes normally, 1 when initialization fails
+*/
 int main(void)
 {
     SDL_Window *window;
@@ -109,6 +322,7 @@ int main(void)
     SDL_Rect savedJ2;
     SDL_Rect savedBullet;
     SDL_Rect savedNpc;
+    SDL_Rect previousPlayer;
     SDL_Texture *background;
     SDL_Texture *backgroundMid;
     SDL_Texture *backgroundFore;
@@ -132,7 +346,10 @@ int main(void)
     int enemySlots[MAX_NPCS];
     int joueurActif;
     int puzzleChallengeUsed;
+    int quitterSansScore;
+    int debugCollision;
     int finalScore;
+    char selectedSave[SAVE_PATH_MAX];
     Uint32 now;
 
     if (!initSDL(&window, &renderer))
@@ -142,9 +359,9 @@ int main(void)
     if (font == NULL)
         printf("[ERREUR] TTF_OpenFont : %s\n", TTF_GetError());
 
-    background = IMG_LoadTexture(renderer, "assets/background_far_pixel.png");
-    backgroundMid = IMG_LoadTexture(renderer, "assets/background_mid_pixel.png");
-    backgroundFore = IMG_LoadTexture(renderer, "assets/background_fore_pixel.png");
+    background = IMG_LoadTexture(renderer, "assets/mars_ship_level_full.png");
+    backgroundMid = IMG_LoadTexture(renderer, "assets/mars_ship_level_mid.png");
+    backgroundFore = IMG_LoadTexture(renderer, "assets/mars_ship_level_foreground.png");
     shipGroundTex = IMG_LoadTexture(renderer, "assets/ship_ground_pixel.png");
     marsGroundTex = IMG_LoadTexture(renderer, "assets/mars_ground_pixel.png");
     shipPlatformTex = IMG_LoadTexture(renderer, "assets/ship_platform_pixel.png");
@@ -242,6 +459,8 @@ int main(void)
     movingMax[1] = 3700;
 
     running = 1;
+    quitterSansScore = 0;
+    debugCollision = 0;
     puzzleChallengeUsed = 0;
     for (i = 0; i < MAX_ENEMIES; i++)
         mapEnemies[i].active = 0;
@@ -253,6 +472,19 @@ int main(void)
     bgDst.y = 0;
     bgDst.w = SCREEN_W;
     bgDst.h = SCREEN_H;
+
+    if (prompt_select_save(renderer, font, selectedSave, sizeof(selectedSave)))
+    {
+        if (!load_game_state(selectedSave,
+                             &J1, &J2,
+                             bullets, MAX_BULLETS,
+                             npcs, MAX_NPCS,
+                             stablePlatforms, STABLE_PLATFORM_COUNT,
+                             movingPlatforms, MOVING_PLATFORM_COUNT,
+                             movingDir, movingMin, movingMax,
+                             &joueurActif, &puzzleChallengeUsed))
+            show_save_message(renderer, font, "Could not load saved game");
+    }
 
     while (running)
     {
@@ -458,6 +690,10 @@ int main(void)
                 SDL_DestroyTexture(mapTexture);
             }
         }
+        if (debugCollision)
+            afficherDebugCollision(renderer, &J1, &J2, camera.x,
+                                   shipGround, marsGround,
+                                   stablePlatforms, movingPlatforms);
         afficherHUD(renderer, font, &J1, &J2, joueurActif);
         SDL_RenderPresent(renderer);
 
@@ -467,10 +703,66 @@ int main(void)
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
-                running = 0;
+            {
+                int saveChoice = prompt_save_game(renderer, font);
+
+                if (saveChoice == 1)
+                {
+                    if (sauvegarderProgression(&J1, &J2, bullets, npcs,
+                                                stablePlatforms, movingPlatforms,
+                                                movingDir, movingMin, movingMax,
+                                                joueurActif, puzzleChallengeUsed,
+                                                renderer, font))
+                        running = 0;
+                    else
+                        show_save_message(renderer, font, "Save cancelled");
+                }
+                else if (saveChoice == 0)
+                {
+                    quitterSansScore = 1;
+                    running = 0;
+                }
+            }
 
             if (event.type == SDL_KEYDOWN)
             {
+                if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+                {
+                    int saveChoice = prompt_save_game(renderer, font);
+
+                    if (saveChoice == 1)
+                    {
+                        if (sauvegarderProgression(&J1, &J2, bullets, npcs,
+                                                   stablePlatforms, movingPlatforms,
+                                                   movingDir, movingMin, movingMax,
+                                                   joueurActif, puzzleChallengeUsed,
+                                                   renderer, font))
+                            running = 0;
+                        else
+                            show_save_message(renderer, font, "Save cancelled");
+                    }
+                    else if (saveChoice == 0)
+                    {
+                        quitterSansScore = 1;
+                        running = 0;
+                    }
+                }
+
+                if (event.key.keysym.scancode == SDL_SCANCODE_F5)
+                {
+                    if (sauvegarderProgression(&J1, &J2, bullets, npcs,
+                                               stablePlatforms, movingPlatforms,
+                                               movingDir, movingMin, movingMax,
+                                               joueurActif, puzzleChallengeUsed,
+                                               renderer, font))
+                        show_save_message(renderer, font, "Game saved");
+                    else
+                        show_save_message(renderer, font, "Save failed");
+                }
+
+                if (event.key.keysym.scancode == SDL_SCANCODE_F3)
+                    debugCollision = !debugCollision;
+
                 if (event.key.keysym.scancode == SDL_SCANCODE_M)
                 {
                     if (joueurActif == 1)
@@ -546,17 +838,23 @@ int main(void)
 
         if (joueurActif == 1)
         {
+            previousPlayer = J1.posScreen;
             gererEntreeJoueurClavier(&J1, keys, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP);
             J2.moveLeft = 0;
             J2.moveRight = 0;
             updateJoueur(&J1, now);
+            appliquerCollisionDessousPlateformes(&J1, previousPlayer,
+                                                 stablePlatforms, movingPlatforms);
         }
         else
         {
+            previousPlayer = J2.posScreen;
             gererEntreeJoueurClavier(&J2, keys, SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W);
             J1.moveLeft = 0;
             J1.moveRight = 0;
             updateJoueur(&J2, now);
+            appliquerCollisionDessousPlateformes(&J2, previousPlayer,
+                                                 stablePlatforms, movingPlatforms);
         }
 
         if (running)
@@ -654,24 +952,27 @@ int main(void)
         }
     }
 
-    finalScore = J1.score + J2.score;
-    init_highscore(&hs, renderer, finalScore);
-    running = 1;
-    while (running)
+    if (!quitterSansScore)
     {
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-        render_highscore(&hs, renderer);
-        SDL_RenderPresent(renderer);
+        finalScore = J1.score + J2.score;
+        init_highscore(&hs, renderer, finalScore);
+        running = 1;
+        while (running)
+        {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            render_highscore(&hs, renderer);
+            SDL_RenderPresent(renderer);
 
-        while (SDL_PollEvent(&event))
-            handle_highscore_event(&hs, event, &running);
+            while (SDL_PollEvent(&event))
+                handle_highscore_event(&hs, event, &running);
 
-        if (hs.go_to_menu || hs.go_to_puzzle)
-            running = 0;
-        SDL_Delay(16);
+            if (hs.go_to_menu || hs.go_to_puzzle)
+                running = 0;
+            SDL_Delay(16);
+        }
+        free_highscore(&hs);
     }
-    free_highscore(&hs);
 
     if (minimapReady)
     {

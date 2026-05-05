@@ -4,8 +4,11 @@ static int chargerAnimation(Animation *anim, SDL_Renderer *renderer,
                             const char *path, int rows, int cols)
 {
     SDL_Surface *surf;
+    SDL_Surface *rgbaSurf;
     int texW;
     int texH;
+    int r;
+    int c;
 
     surf = IMG_Load(path);
     if (surf == NULL)
@@ -14,11 +17,19 @@ static int chargerAnimation(Animation *anim, SDL_Renderer *renderer,
         return 0;
     }
 
-    anim->texture = SDL_CreateTextureFromSurface(renderer, surf);
+    rgbaSurf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_RGBA32, 0);
     SDL_FreeSurface(surf);
+    if (rgbaSurf == NULL)
+    {
+        printf("[ERREUR] SDL_ConvertSurfaceFormat(\"%s\") : %s\n", path, SDL_GetError());
+        return 0;
+    }
+
+    anim->texture = SDL_CreateTextureFromSurface(renderer, rgbaSurf);
 
     if (anim->texture == NULL)
     {
+        SDL_FreeSurface(rgbaSurf);
         printf("[ERREUR] SDL_CreateTextureFromSurface(\"%s\") : %s\n", path, SDL_GetError());
         return 0;
     }
@@ -28,6 +39,72 @@ static int chargerAnimation(Animation *anim, SDL_Renderer *renderer,
     anim->cols = cols;
     anim->frameW = texW / cols;
     anim->frameH = texH / rows;
+    anim->drawW = 0;
+    anim->drawH = PLAYER_H;
+
+    for (r = 0; r < rows && r < 2; r++)
+    {
+        for (c = 0; c < cols && c < PLUTO_MAX_FRAMES; c++)
+        {
+            int x0 = (c * texW) / cols;
+            int x1 = ((c + 1) * texW) / cols;
+            int y0 = (r * texH) / rows;
+            int y1 = ((r + 1) * texH) / rows;
+            int maxOpaqueY = y0;
+            int x;
+            int y;
+            int found = 0;
+
+            for (y = y0; y < y1; y++)
+            {
+                Uint32 *row = (Uint32 *)((Uint8 *)rgbaSurf->pixels + y * rgbaSurf->pitch);
+
+                for (x = x0; x < x1; x++)
+                {
+                    Uint8 red;
+                    Uint8 green;
+                    Uint8 blue;
+                    Uint8 alpha;
+
+                    SDL_GetRGBA(row[x], rgbaSurf->format, &red, &green, &blue, &alpha);
+
+                    if (alpha >= 32)
+                    {
+                        if (y > maxOpaqueY)
+                            maxOpaqueY = y;
+                        found = 1;
+                    }
+                }
+            }
+
+            if (found)
+            {
+                anim->frames[r][c].x = x0;
+                anim->frames[r][c].y = y0;
+                anim->frames[r][c].w = x1 - x0;
+                anim->frames[r][c].h = maxOpaqueY - y0 + 1;
+            }
+            else
+            {
+                anim->frames[r][c].x = x0;
+                anim->frames[r][c].y = y0;
+                anim->frames[r][c].w = x1 - x0;
+                anim->frames[r][c].h = y1 - y0;
+            }
+
+            if (anim->frames[r][c].h > 0)
+            {
+                int scaledW = (anim->frames[r][c].w * anim->drawH) / anim->frames[r][c].h;
+                if (scaledW > anim->drawW)
+                    anim->drawW = scaledW;
+            }
+        }
+    }
+
+    if (anim->drawW <= 0)
+        anim->drawW = PLAYER_W;
+
+    SDL_FreeSurface(rgbaSurf);
 
     return 1;
 }
@@ -74,13 +151,13 @@ static void setPlayerState(Joueur *J, PlayerState state)
             J->currentFrame = 0;
             break;
         case STATE_WALK:
-            J->frameDelay = 1600;
+            J->frameDelay = 95;
             break;
         case STATE_JUMP:
-            J->frameDelay = 140;
+            J->frameDelay = 105;
             break;
         case STATE_FIRE:
-            J->frameDelay = 130;
+            J->frameDelay = 85;
             break;
         case STATE_DIE:
             J->frameDelay = 170;
@@ -108,6 +185,8 @@ int initialiserJoueur(Joueur *J, SDL_Renderer *renderer, int x, int y)
     J->posScreen.y = y;
     J->posScreen.w = PLAYER_W;
     J->posScreen.h = PLAYER_H;
+    J->drawOffsetX = 0;
+    J->drawOffsetY = 0;
 
     J->startX = x;
     J->startY = y;
@@ -245,6 +324,8 @@ void updateJoueur(Joueur *J, Uint32 now)
 
     if (J->state == STATE_IDLE)
         J->currentFrame = 0;
+    else if (J->lastFrameTime == 0)
+        J->lastFrameTime = now;
     else if (now - J->lastFrameTime >= J->frameDelay)
     {
         J->lastFrameTime = now;
@@ -276,16 +357,27 @@ void updateJoueur(Joueur *J, Uint32 now)
     }
 
     anim = getCurrentAnimation(J);
-    J->posSprite.w = anim->frameW;
-    J->posSprite.h = anim->frameH;
-    J->posSprite.x = J->currentFrame * anim->frameW;
-    J->posSprite.y = J->facing * anim->frameH;
+    if (J->currentFrame >= anim->cols)
+        J->currentFrame = 0;
+    J->posSprite = anim->frames[J->facing][J->currentFrame];
+}
+
+SDL_Rect getJoueurDrawRect(Joueur *J)
+{
+    Animation *anim;
+    SDL_Rect drawRect;
+
+    anim = getCurrentAnimation(J);
+    drawRect.w = (anim != NULL) ? anim->drawW : PLAYER_W;
+    drawRect.h = (anim != NULL) ? anim->drawH : PLAYER_H;
+    drawRect.x = J->posScreen.x + (J->posScreen.w - drawRect.w) / 2 + J->drawOffsetX;
+    drawRect.y = J->posScreen.y + J->posScreen.h - drawRect.h + J->drawOffsetY;
+    return drawRect;
 }
 
 void renderJoueur(SDL_Renderer *renderer, Joueur *J)
 {
     Animation *anim;
-    SDL_Rect drawRect;
 
     if (!J->visible)
         return;
@@ -294,9 +386,8 @@ void renderJoueur(SDL_Renderer *renderer, Joueur *J)
     if (anim == NULL || anim->texture == NULL)
         return;
 
-    drawRect = J->posScreen;
-    drawRect.y = J->posScreen.y + J->posScreen.h - drawRect.h;
-    SDL_RenderCopy(renderer, anim->texture, &J->posSprite, &drawRect);
+    J->drawRect = getJoueurDrawRect(J);
+    SDL_RenderCopy(renderer, anim->texture, &J->posSprite, &J->drawRect);
 }
 
 void reinitialiserPositionJoueur(Joueur *J)

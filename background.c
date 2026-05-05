@@ -1,3 +1,14 @@
+/**
+* @file background.c
+* @brief Background module implementation.
+* @author C Team
+* @version 0.1
+* @date May 02, 2026
+*
+* This file contains the functions used to initialize, scroll, render,
+* and free the background, platforms, timer, guide, and buttons.
+*/
+
 #include "background.h"
 #include <stdio.h>
 #include <string.h>
@@ -6,6 +17,12 @@
 /*  PLATFORMS                                                           */
 /* ------------------------------------------------------------------ */
 
+/**
+* @brief To initialize the platforms of a background.
+* @param bg the background
+* @param level the level number
+* @return Nothing
+*/
 void init_platforms(Background *bg, int level)
 {
     int count;
@@ -42,6 +59,13 @@ void init_platforms(Background *bg, int level)
 /*  BACKGROUND                                                          */
 /* ------------------------------------------------------------------ */
 
+/**
+* @brief To initialize the background.
+* @param bg the background
+* @param renderer the SDL renderer
+* @param level the level number
+* @return Nothing
+*/
 void init_background(Background *bg, SDL_Renderer *renderer, int level)
 {
     int y;
@@ -69,6 +93,14 @@ void init_background(Background *bg, SDL_Renderer *renderer, int level)
     init_platforms(bg, level);
 }
 
+/**
+* @brief To scroll the background camera.
+* @param bg the background
+* @param numBack the number of the background camera
+* @param dx the horizontal scroll value
+* @param dy the vertical scroll value
+* @return Nothing
+*/
 void scroll_background(Background *bg, int numBack, int dx, int dy)
 {
     SDL_Rect *cam;
@@ -84,6 +116,11 @@ void scroll_background(Background *bg, int numBack, int dx, int dy)
     if (cam->y + cam->h > bg->imgH) cam->y = bg->imgH - cam->h;
 }
 
+/**
+* @brief To update the platforms.
+* @param bg the background
+* @return Nothing
+*/
 void update_platforms(Background *bg)
 {
     int i;
@@ -108,6 +145,12 @@ void update_platforms(Background *bg)
     }
 }
 
+/**
+* @brief To show the background.
+* @param bg the background
+* @param renderer the SDL renderer
+* @return Nothing
+*/
 void render_background(Background *bg, SDL_Renderer *renderer)
 {
     /* In single mode expand player-1 camera to full screen width */
@@ -139,6 +182,12 @@ void render_background(Background *bg, SDL_Renderer *renderer)
     }
 }
 
+/**
+* @brief To show the platforms.
+* @param bg the background
+* @param renderer the SDL renderer
+* @return Nothing
+*/
 void render_platforms(Background *bg, SDL_Renderer *renderer)
 {
     int i;
@@ -190,6 +239,11 @@ void render_platforms(Background *bg, SDL_Renderer *renderer)
     SDL_RenderSetClipRect(renderer, NULL);
 }
 
+/**
+* @brief To free the background texture.
+* @param bg the background
+* @return Nothing
+*/
 void free_background(Background *bg)
 {
     if (bg->image) {
@@ -202,21 +256,36 @@ void free_background(Background *bg)
 /*  TIMER                                                               */
 /* ------------------------------------------------------------------ */
 
+/**
+* @brief To initialize the timer.
+* @param t the timer
+* @return Nothing
+*/
 void init_timer(GameTimer *t)
 {
     t->startTime = SDL_GetTicks();
     t->elapsed   = 0;
 }
 
+/**
+* @brief To update the timer.
+* @param t the timer
+* @return Nothing
+*/
 void update_timer(GameTimer *t)
 {
     t->elapsed = SDL_GetTicks() - t->startTime;
 }
 
-/*
- * centerX : horizontal center of the viewport this timer belongs to
- * y       : vertical position (pixels from top)
- */
+/**
+* @brief To show the timer.
+* @param t the timer
+* @param renderer the SDL renderer
+* @param font the font used for the timer
+* @param centerX the horizontal center of the viewport
+* @param y the vertical position
+* @return Nothing
+*/
 void render_timer(GameTimer *t, SDL_Renderer *renderer, TTF_Font *font,
                   int centerX, int y)
 {
@@ -262,6 +331,16 @@ void render_timer(GameTimer *t, SDL_Renderer *renderer, TTF_Font *font,
 /*  ALPHA HELPER                                                        */
 /* ------------------------------------------------------------------ */
 
+/**
+* @brief To draw a transparent rectangle.
+* @param r the SDL renderer
+* @param rect the rectangle to fill
+* @param red the red color value
+* @param green the green color value
+* @param blue the blue color value
+* @param alpha the alpha value
+* @return Nothing
+*/
 void fill_rect_alpha(SDL_Renderer *r, SDL_Rect rect,
                      Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
 {
@@ -275,9 +354,12 @@ void fill_rect_alpha(SDL_Renderer *r, SDL_Rect rect,
 /*  GUIDE                                                               */
 /* ------------------------------------------------------------------ */
 
-/*
- * player : 1 or 2 – determines which controls are shown
- */
+/**
+* @brief To initialize the guide.
+* @param g the guide
+* @param player the player number
+* @return Nothing
+*/
 void init_guide(Guide *g, int player)
 {
     g->visible   = 0;
@@ -318,15 +400,25 @@ void init_guide(Guide *g, int player)
     #undef GL
 }
 
+/**
+* @brief To toggle the guide visibility.
+* @param g the guide
+* @return Nothing
+*/
 void toggle_guide(Guide *g)
 {
     g->visible = !g->visible;
 }
 
-/*
- * offsetX : left pixel of the viewport (0 for P1, W_HALF for P2)
- * maxW    : width of the viewport (W_HALF in split, W_SCREEN in single)
- */
+/**
+* @brief To show the guide.
+* @param g the guide
+* @param renderer the SDL renderer
+* @param font the font used for guide text
+* @param offsetX the left pixel of the viewport
+* @param maxW the width of the viewport
+* @return Nothing
+*/
 void render_guide(Guide *g, SDL_Renderer *renderer, TTF_Font *font,
                   int offsetX, int maxW)
 {
@@ -396,6 +488,17 @@ void render_guide(Guide *g, SDL_Renderer *renderer, TTF_Font *font,
 /*  BUTTON                                                              */
 /* ------------------------------------------------------------------ */
 
+/**
+* @brief To initialize a button.
+* @param btn the button
+* @param renderer the SDL renderer
+* @param path the image path
+* @param x the button x position
+* @param y the button y position
+* @param w the button width
+* @param h the button height
+* @return Nothing
+*/
 void init_button(Button *btn, SDL_Renderer *renderer, const char *path,
                  int x, int y, int w, int h)
 {
@@ -418,6 +521,13 @@ void init_button(Button *btn, SDL_Renderer *renderer, const char *path,
     }
 }
 
+/**
+* @brief To check if a button is hovered.
+* @param btn the button
+* @param mx the mouse x position
+* @param my the mouse y position
+* @return Nothing
+*/
 void check_button_hover(Button *btn, int mx, int my)
 {
     SDL_Point p;
@@ -426,6 +536,13 @@ void check_button_hover(Button *btn, int mx, int my)
     btn->hovered = SDL_PointInRect(&p, &btn->pos);
 }
 
+/**
+* @brief To check if a button is clicked.
+* @param btn the button
+* @param mx the mouse x position
+* @param my the mouse y position
+* @return 1 if the button is clicked, 0 otherwise
+*/
 int button_clicked(Button *btn, int mx, int my)
 {
     SDL_Point p;
@@ -434,10 +551,14 @@ int button_clicked(Button *btn, int mx, int my)
     return SDL_PointInRect(&p, &btn->pos);
 }
 
-/*
- * Renders the button. If no texture is loaded a coloured rectangle
- * with a text label is drawn instead.
- */
+/**
+* @brief To show a button.
+* @param btn the button
+* @param renderer the SDL renderer
+* @param font the font used for the button label
+* @param label the button label
+* @return Nothing
+*/
 void render_button(Button *btn, SDL_Renderer *renderer, TTF_Font *font,
                    const char *label)
 {
@@ -492,6 +613,11 @@ void render_button(Button *btn, SDL_Renderer *renderer, TTF_Font *font,
     }
 }
 
+/**
+* @brief To free a button texture.
+* @param btn the button
+* @return Nothing
+*/
 void free_button(Button *btn)
 {
     if (btn->texture) {

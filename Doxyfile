@@ -1,0 +1,15 @@
+PROJECT_NAME           = "Pfinal"
+PROJECT_NUMBER         = "0.1"
+PROJECT_BRIEF          = "SDL platform game with background, minimap, puzzle challenge, and scores"
+OUTPUT_DIRECTORY       =
+OUTPUT_LANGUAGE        = English
+OPTIMIZE_OUTPUT_FOR_C  = YES
+INPUT                  = main.c background.c background.h header.h
+FILE_PATTERNS          = *.c *.h
+RECURSIVE              = YES
+EXCLUDE                = docs
+GENERATE_LATEX         = NO
+GENERATE_HTML          = YES
+EXTRACT_ALL            = NO
+EXTRACT_STATIC         = YES
+HAVE_DOT               = NO

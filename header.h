@@ -1,3 +1,14 @@
+/**
+* @file header.h
+* @brief Shared header file for the main SDL game.
+* @author C Team
+* @version 0.1
+* @date May 02, 2026
+*
+* This file contains constants, structures, and function prototypes used
+* by the player, enemy, bullet, and SDL initialization modules.
+*/
+
 #ifndef HEADER_H
 #define HEADER_H
 
@@ -36,6 +47,7 @@
 #define PLUTO_JUMP_COLS 7
 #define PLUTO_DIE_ROWS 2
 #define PLUTO_DIE_COLS 6
+#define PLUTO_MAX_FRAMES 8
 
 #define NPC_WALK_COLS 9
 #define NPC_WALK_ROWS 2
@@ -83,80 +95,102 @@ typedef enum
     ENEMY_REMOVED
 } EnemyState;
 
+/**
+* @struct Animation
+* @brief struct for sprite animation.
+*/
 typedef struct
 {
-    SDL_Texture *texture;
-    int rows;
-    int cols;
-    int frameW;
-    int frameH;
+    SDL_Texture *texture; /*!< Animation texture. */
+    int rows; /*!< Number of sprite sheet rows. */
+    int cols; /*!< Number of sprite sheet columns. */
+    int frameW; /*!< Width of one frame. */
+    int frameH; /*!< Height of one frame. */
+    int drawW; /*!< Stable drawing width for the animation. */
+    int drawH; /*!< Stable drawing height for the animation. */
+    SDL_Rect frames[2][PLUTO_MAX_FRAMES]; /*!< Cropped source rectangles for animation frames. */
 } Animation;
 
+/**
+* @struct Bullet
+* @brief struct for a bullet.
+*/
 typedef struct
 {
-    int active;
-    SDL_Rect rect;
-    int direction;
-    int owner;
+    int active; /*!< Active state of the bullet. */
+    SDL_Rect rect; /*!< Bullet rectangle. */
+    int direction; /*!< Bullet direction. */
+    int owner; /*!< Player owner of the bullet. */
 } Bullet;
 
+/**
+* @struct Joueur
+* @brief struct for a player.
+*/
 typedef struct
 {
-    Animation walk;
-    Animation jump;
-    Animation fire;
-    Animation die;
-    SDL_Rect posScreen;
-    SDL_Rect posSprite;
-    PlayerState state;
-    int facing;
-    int currentFrame;
-    Uint32 lastFrameTime;
-    Uint32 frameDelay;
-    int score;
-    int vies;
-    int health;
-    int alive;
-    int visible;
-    int startX;
-    int startY;
-    int floorY;
-    int isJumping;
-    int jumpsUsed;
-    int jumpHeld;
-    float velY;
-    float posYFloat;
-    int moveLeft;
-    int moveRight;
-    Uint32 lastShotTime;
-    Uint32 invulnerableUntil;
-    Uint32 deathTime;
+    Animation walk; /*!< Walking animation. */
+    Animation jump; /*!< Jump animation. */
+    Animation fire; /*!< Fire animation. */
+    Animation die; /*!< Death animation. */
+    SDL_Rect posScreen; /*!< Player position on the screen. */
+    SDL_Rect posSprite; /*!< Player source sprite rectangle. */
+    SDL_Rect drawRect; /*!< Visual drawing rectangle for the player. */
+    int drawOffsetX; /*!< Horizontal drawing offset from the hitbox. */
+    int drawOffsetY; /*!< Vertical drawing offset from the hitbox bottom. */
+    PlayerState state; /*!< Current player state. */
+    int facing; /*!< Current facing direction. */
+    int currentFrame; /*!< Current animation frame. */
+    Uint32 lastFrameTime; /*!< Time of the last frame update. */
+    Uint32 frameDelay; /*!< Delay between animation frames. */
+    int score; /*!< Player score. */
+    int vies; /*!< Player lives. */
+    int health; /*!< Player health. */
+    int alive; /*!< Alive state of the player. */
+    int visible; /*!< Visibility state of the player. */
+    int startX; /*!< Start x position. */
+    int startY; /*!< Start y position. */
+    int floorY; /*!< Current floor y position. */
+    int isJumping; /*!< Jumping state. */
+    int jumpsUsed; /*!< Number of jumps already used. */
+    int jumpHeld; /*!< Jump key held state. */
+    float velY; /*!< Vertical velocity. */
+    float posYFloat; /*!< Precise vertical position. */
+    int moveLeft; /*!< Move-left state. */
+    int moveRight; /*!< Move-right state. */
+    Uint32 lastShotTime; /*!< Time of the last shot. */
+    Uint32 invulnerableUntil; /*!< End time of invulnerability. */
+    Uint32 deathTime; /*!< Time of death. */
 } Joueur;
 
+/**
+* @struct NPC
+* @brief struct for an enemy character.
+*/
 typedef struct
 {
-    float x;
-    float y;
-    int w;
-    int h;
-    SDL_Texture *walkTexture;
-    SDL_Texture *slashTexture;
-    SDL_Texture *dieTexture;
-    SDL_Rect srcRect;
-    SDL_Rect dstRect;
-    int useSprite;
-    int direction;
-    int posMin;
-    int posMax;
-    int groundY;
-    int action;
-    int health;
-    int maxHealth;
-    EnemyState state;
-    Uint32 lastFrameTime;
-    Uint32 frameDelay;
-    Uint32 attackStartedAt;
-    Uint32 nextAttackAt;
+    float x; /*!< Enemy x position. */
+    float y; /*!< Enemy y position. */
+    int w; /*!< Enemy width. */
+    int h; /*!< Enemy height. */
+    SDL_Texture *walkTexture; /*!< Walking texture. */
+    SDL_Texture *slashTexture; /*!< Attack texture. */
+    SDL_Texture *dieTexture; /*!< Death texture. */
+    SDL_Rect srcRect; /*!< Source sprite rectangle. */
+    SDL_Rect dstRect; /*!< Destination rectangle. */
+    int useSprite; /*!< Sprite rendering state. */
+    int direction; /*!< Enemy direction. */
+    int posMin; /*!< Minimum patrol position. */
+    int posMax; /*!< Maximum patrol position. */
+    int groundY; /*!< Ground y position. */
+    int action; /*!< Current action index. */
+    int health; /*!< Enemy health. */
+    int maxHealth; /*!< Maximum enemy health. */
+    EnemyState state; /*!< Current enemy state. */
+    Uint32 lastFrameTime; /*!< Time of the last frame update. */
+    Uint32 frameDelay; /*!< Delay between animation frames. */
+    Uint32 attackStartedAt; /*!< Time when attack started. */
+    Uint32 nextAttackAt; /*!< Next allowed attack time. */
 } NPC;
 
 int initSDL(SDL_Window **window, SDL_Renderer **renderer);
@@ -170,6 +204,7 @@ void gererEntreeJoueurClavier(Joueur *J, const Uint8 *keys,
 void lancerSaut(Joueur *J);
 void updateJoueur(Joueur *J, Uint32 now);
 void renderJoueur(SDL_Renderer *renderer, Joueur *J);
+SDL_Rect getJoueurDrawRect(Joueur *J);
 void reinitialiserPositionJoueur(Joueur *J);
 void appliquerDegatsJoueur(Joueur *J, int damage, Uint32 now);
 void respawnJoueur(Joueur *J);
