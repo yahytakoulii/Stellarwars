@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['lastframetime_175',['lastFrameTime',['../structJoueur.html#aa10a4dddc3d2aaacd0985f9057817dba',1,'Joueur::lastFrameTime()'],['../structNPC.html#a33096c664c1c7bdf94013960b65d22e9',1,'NPC::lastFrameTime()']]],
-  ['lastshottime_176',['lastShotTime',['../structJoueur.html#ad188826a6ad6f02a72ddd53a5ccedafd',1,'Joueur']]],
-  ['level_177',['level',['../structBackground.html#a09ff60176bdf86ce1bd8fbe3c4034f16',1,'Background']]],
-  ['linecount_178',['lineCount',['../structGuide.html#a9832da1fb456df228ef12dcf1fed46e8',1,'Guide']]],
-  ['lines_179',['lines',['../structGuide.html#ae980edf6ef85caf8fcadf30ed2b27e16',1,'Guide']]]
+  ['j1_0',['J1',['../structSaveData.html#a6e42709b127f3ff831815e7fb5a853bb',1,'SaveData']]],
+  ['j2_1',['J2',['../structSaveData.html#abdef34d1b5218e81dcc6cd440f551862',1,'SaveData']]],
+  ['joueuractif_2',['joueurActif',['../structSaveData.html#a4ce68c5026201401206d49e6051a00b3',1,'SaveData']]],
+  ['jump_3',['jump',['../structPlayerAssets.html#a72f497622a4a3db7341b0d783a675d55',1,'PlayerAssets::jump'],['../structJoueur.html#aba9023b5ad963c4d687d4159c73019a9',1,'Joueur::jump']]],
+  ['jumpheld_4',['jumpheld',['../structJoueur.html#a0af9dc654f48226df9fc15e4f964bcfc',1,'Joueur::jumpHeld'],['../structSavedPlayer.html#a9e7e1e930f5772edc925ee0e06d08b60',1,'SavedPlayer::jumpHeld']]],
+  ['jumpsused_5',['jumpsused',['../structJoueur.html#a2749db55319218db34d496aa480f0ee5',1,'Joueur::jumpsUsed'],['../structSavedPlayer.html#a09b654029237e46398fbc25561449c2c',1,'SavedPlayer::jumpsUsed']]]
 ];

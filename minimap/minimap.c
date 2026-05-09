@@ -66,15 +66,15 @@ int init_minimap(Minimap *m, const char *path, int sw, int sh, int bw, int bh) {
     Uint32 amask = 0;
 
     #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-        rmask = 0xff000000;
-        gmask = 0x00ff0000;
-        bmask = 0x0000ff00;
-        amask = 0x000000ff;
+        rmask = 4278190080u;
+        gmask = 16711680u;
+        bmask = 65280u;
+        amask = 255u;
     #else
-        rmask = 0x000000ff;
-        gmask = 0x0000ff00;
-        bmask = 0x00ff0000;
-        amask = 0xff000000;
+        rmask = 255u;
+        gmask = 65280u;
+        bmask = 16711680u;
+        amask = 4278190080u;
     #endif
 
     int dot_size = PLAYER_DOT_SIZE;

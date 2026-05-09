@@ -26,6 +26,17 @@ int main(int argc, char *argv[]) {
     SDL_Event ev;
     
     while (running) {
+        SDL_Rect camera = {0, 0, 1080, 607};
+        update_minimap(&mm, p.pos, camera);
+
+        SDL_BlitSurface(bg, NULL, screen, NULL);
+        SDL_BlitSurface(p.sprite, NULL, screen, &p.pos);
+        
+        display_minimap(mm, screen);
+        display_entities_on_map(mm, screen, enemies);
+        
+        SDL_UpdateWindowSurface(win);
+
         while (SDL_PollEvent(&ev)) {
             if (ev.type == SDL_QUIT) running = 0;
         }
@@ -39,17 +50,6 @@ int main(int argc, char *argv[]) {
         p.pos.y += p.velY;
         if (p.pos.y >= 500) { p.pos.y = 500; p.velY = 0; p.onGround = 1; }
 
-       
-        SDL_Rect camera = {0, 0, 1080, 607};
-        update_minimap(&mm, p.pos, camera);
-
-        SDL_BlitSurface(bg, NULL, screen, NULL);
-        SDL_BlitSurface(p.sprite, NULL, screen, &p.pos);
-        
-        display_minimap(mm, screen);
-        display_entities_on_map(mm, screen, enemies);
-        
-        SDL_UpdateWindowSurface(win);
         SDL_Delay(16);
     }
 

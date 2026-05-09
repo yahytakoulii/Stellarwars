@@ -1,4 +1,19 @@
 var searchData=
 [
-  ['elapsed_156',['elapsed',['../structGameTimer.html#addfef2e23e860fe3a89a3ffb24c4304d',1,'GameTimer']]]
+  ['deathtime_0',['deathTime',['../structJoueur.html#ad77a1d0e34477de582e6b635cd4a43b4',1,'Joueur']]],
+  ['die_1',['die',['../structPlayerAssets.html#ad93bcc6340afd397888cbc9f0d286d1e',1,'PlayerAssets::die'],['../structJoueur.html#aa33377a52a20a0924dcdf1f5965b3342',1,'Joueur::die']]],
+  ['dietexture_2',['dieTexture',['../structNPC.html#a84c0e7960a20f614e21a89b7dea53f7d',1,'NPC']]],
+  ['direction_3',['direction',['../structBullet.html#a368daaff6965adc373d8fec654e29ef0',1,'Bullet::direction'],['../structNPC.html#abf5f75167466405b97e2f14367dc3091',1,'NPC::direction'],['../structSavedNPC.html#a70ed59e51278b981512a92c0a8ee4c22',1,'SavedNPC::direction']]],
+  ['down_4',['down',['../structMainMenuButton.html#a44ec37097520739fca8a74231979c1d1',1,'MainMenuButton']]],
+  ['drag_5foffset_5fx_5',['drag_offset_x',['../structGameContext.html#a640a73edea4f6e5f5d3fc149ee50914e',1,'GameContext']]],
+  ['drag_5foffset_5fy_6',['drag_offset_y',['../structGameContext.html#a5478aa722aa9ba5c6906caa9e39c816d',1,'GameContext']]],
+  ['drag_5frect_7',['drag_rect',['../structPiece.html#a46f62edf3638523168cbebaca13ca79b',1,'Piece']]],
+  ['dragging_8',['dragging',['../structGameContext.html#a3900b3f79322a730b61b52c9da0d7eaa',1,'GameContext']]],
+  ['drawh_9',['drawH',['../structAnimation.html#af1fe703e48581cf0c297f5b1cd8699e8',1,'Animation']]],
+  ['drawoffsetx_10',['drawOffsetX',['../structJoueur.html#adb2d23913fa4b54c87bfe06e0dd0a5aa',1,'Joueur']]],
+  ['drawoffsety_11',['drawOffsetY',['../structJoueur.html#a4b6e2fdaa631df644a3f07aed83c3a96',1,'Joueur']]],
+  ['drawrect_12',['drawRect',['../structJoueur.html#a0c77d681287651335814cda9290be650',1,'Joueur']]],
+  ['draww_13',['drawW',['../structAnimation.html#a53452e53d0586cc20eaa5ce8218a1906',1,'Animation']]],
+  ['dstrect_14',['dstrect',['../structNPC.html#ae4ef18ccd5ddfa37d80984a700c95208',1,'NPC::dstRect'],['../structSavedNPC.html#ad00beb61503d38526847200074ee5b94',1,'SavedNPC::dstRect']]],
+  ['dx_15',['dx',['../structPlatform.html#a58f038fadef8520b46ce126e4bf480fa',1,'Platform']]]
 ];

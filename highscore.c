@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
-/* ------------------------------------------------------------------ */
-/*  TEXTURE HELPERS                                                     */
-/* ------------------------------------------------------------------ */
+
+
+
 
 SDL_Texture *loadTexture(const char *path, SDL_Renderer *renderer)
 {
@@ -59,9 +59,9 @@ void safe_query_texture(SDL_Texture *tex, SDL_Rect *pos, int fw, int fh)
     }
 }
 
-/* ------------------------------------------------------------------ */
-/*  SCORE FILE I/O                                                      */
-/* ------------------------------------------------------------------ */
+
+
+
 
 void save_scores(Highscore *h)
 {
@@ -109,9 +109,9 @@ void insert_score(Highscore *h, const char *name, int score)
     }
 }
 
-/* ------------------------------------------------------------------ */
-/*  BUTTON                                                              */
-/* ------------------------------------------------------------------ */
+
+
+
 
 void check_hover(Button *btn, int mx, int my, Mix_Chunk *hoverSound)
 {
@@ -156,9 +156,9 @@ void render_button(SDL_Renderer *renderer, Button *btn)
     }
 }
 
-/* ------------------------------------------------------------------ */
-/*  VALIDATE ENTRY                                                      */
-/* ------------------------------------------------------------------ */
+
+
+
 
 void validate_entry(Highscore *h)
 {
@@ -174,9 +174,9 @@ void validate_entry(Highscore *h)
         Mix_PlayChannel(-1, h->victorySound, 0);
 }
 
-/* ------------------------------------------------------------------ */
-/*  INIT                                                                */
-/* ------------------------------------------------------------------ */
+
+
+
 
 void init_highscore(Highscore *h, SDL_Renderer *renderer, int playerScore)
 {
@@ -188,39 +188,39 @@ void init_highscore(Highscore *h, SDL_Renderer *renderer, int playerScore)
     h->go_to_menu   = 0;
     h->go_to_puzzle = 0;
 
-    /* Backgrounds and star */
+    
     h->background_entry  = loadTexture("img/png/background-01.png", renderer);
     h->background_scores = loadTexture("img/png/background-01.png", renderer);
     h->star              = loadTexture("img/png/star-01-01.png",     renderer);
 
-    /* Input box */
+    
     h->input.texture = loadTexture("img/png/input-01.png", renderer);
     safe_query_texture(h->input.texture, &h->input.pos, 400, 60);
     h->input.pos.x = (1280 - h->input.pos.w) / 2;
     h->input.pos.y = 250;
 
-    /* Validate button */
+    
     h->validate.texture       = loadTexture("img/png/validate-01.png", renderer);
     h->validate.texture_hover = makeHoverTexture(h->validate.texture, renderer);
     safe_query_texture(h->validate.texture, &h->validate.pos, 200, 60);
     h->validate.pos.x = (1280 - h->validate.pos.w) / 2;
     h->validate.pos.y = h->input.pos.y + h->input.pos.h + 30;
 
-    /* Back button */
+    
     h->back.texture       = loadTexture("img/png/return-01.png", renderer);
     h->back.texture_hover = makeHoverTexture(h->back.texture, renderer);
     safe_query_texture(h->back.texture, &h->back.pos, 150, 60);
     h->back.pos.x = 200;
     h->back.pos.y = 500;
 
-    /* Quit button */
+    
     h->quit.texture       = loadTexture("img/png/exit-01.png", renderer);
     h->quit.texture_hover = makeHoverTexture(h->quit.texture, renderer);
     safe_query_texture(h->quit.texture, &h->quit.pos, 150, 60);
     h->quit.pos.x = 850;
     h->quit.pos.y = 500;
 
-    /* Fonts */
+    
     h->font      = TTF_OpenFont("fonts/arial.ttf", 28);
     h->fontTitle = TTF_OpenFont("fonts/arial.ttf", 52);
     if (!h->font)      printf("TTF_OpenFont Error (font): %s\n",      TTF_GetError());
@@ -231,7 +231,7 @@ void init_highscore(Highscore *h, SDL_Renderer *renderer, int playerScore)
     h->textColor.b = 0;
     h->textColor.a = 255;
 
-    /* Sounds */
+    
     h->hoverSound   = Mix_LoadWAV("sounds/hover.wav");
     h->victorySound = Mix_LoadWAV("sounds/victory.wav");
     h->victoryMusic = Mix_LoadMUS("sounds/victory_music.wav");
@@ -239,7 +239,7 @@ void init_highscore(Highscore *h, SDL_Renderer *renderer, int playerScore)
     if (!h->victorySound) printf("victorySound not loaded: %s\n", Mix_GetError());
     if (!h->victoryMusic) printf("victoryMusic not loaded: %s\n", Mix_GetError());
 
-    /* Scores */
+    
     for (i = 0; i < 3; i++) {
         h->names[i][0] = '\0';
         h->scores[i]   = 0;
@@ -252,9 +252,9 @@ void init_highscore(Highscore *h, SDL_Renderer *renderer, int playerScore)
     SDL_StartTextInput();
 }
 
-/* ------------------------------------------------------------------ */
-/*  RENDER                                                              */
-/* ------------------------------------------------------------------ */
+
+
+
 
 void render_highscore(Highscore *h, SDL_Renderer *renderer)
 {
@@ -268,14 +268,14 @@ void render_highscore(Highscore *h, SDL_Renderer *renderer)
     int          i;
     int          y_offset;
 
-    /* ── Interface 0: name entry screen ── */
+    
     if (h->interface == 0) {
 
         if (h->background_entry)
             SDL_RenderCopy(renderer, h->background_entry, NULL, NULL);
 
         if (h->font) {
-            /* Score display */
+            
             sprintf(scoreStr, "Your score: %d", h->playerScore);
             surf = TTF_RenderText_Blended(h->font, scoreStr, h->textColor);
             if (surf) {
@@ -289,7 +289,7 @@ void render_highscore(Highscore *h, SDL_Renderer *renderer)
                 SDL_DestroyTexture(tex);
             }
 
-            /* Label */
+            
             surf = TTF_RenderText_Blended(h->font, "Enter your name:", h->textColor);
             if (surf) {
                 tex  = SDL_CreateTextureFromSurface(renderer, surf);
@@ -303,7 +303,7 @@ void render_highscore(Highscore *h, SDL_Renderer *renderer)
             }
         }
 
-        /* Input box */
+        
         if (h->input.texture)
             SDL_RenderCopy(renderer, h->input.texture, NULL, &h->input.pos);
         else {
@@ -311,7 +311,7 @@ void render_highscore(Highscore *h, SDL_Renderer *renderer)
             SDL_RenderFillRect(renderer, &h->input.pos);
         }
 
-        /* Typed name */
+        
         if (h->font && strlen(h->playerName) > 0) {
             surf = TTF_RenderText_Blended(h->font, h->playerName, h->textColor);
             if (surf) {
@@ -329,13 +329,13 @@ void render_highscore(Highscore *h, SDL_Renderer *renderer)
         render_button(renderer, &h->validate);
     }
 
-    /* ── Interface 1: scoreboard screen ── */
+    
     if (h->interface == 1) {
 
         if (h->background_scores)
             SDL_RenderCopy(renderer, h->background_scores, NULL, NULL);
 
-        /* Title */
+        
         if (h->fontTitle) {
             surf = TTF_RenderText_Blended(h->fontTitle, "HIGH SCORES", h->textColor);
             if (surf) {
@@ -350,12 +350,12 @@ void render_highscore(Highscore *h, SDL_Renderer *renderer)
             }
         }
 
-        /* Score entries */
+        
         if (h->font) {
             y_offset = 160;
             for (i = 0; i < 3; i++) {
 
-                /* Rank number */
+                
                 sprintf(rank, "%d.", i + 1);
                 surf = TTF_RenderText_Blended(h->font, rank, h->textColor);
                 if (surf) {
@@ -369,7 +369,7 @@ void render_highscore(Highscore *h, SDL_Renderer *renderer)
                     SDL_DestroyTexture(tex);
                 }
 
-                /* Star icon */
+                
                 starPos.x = 380;
                 starPos.y = y_offset;
                 starPos.w = 32;
@@ -377,7 +377,7 @@ void render_highscore(Highscore *h, SDL_Renderer *renderer)
                 if (h->star)
                     SDL_RenderCopy(renderer, h->star, NULL, &starPos);
 
-                /* Name and score */
+                
                 if (strlen(h->names[i]) > 0)
                     sprintf(line, "%s  -  %d", h->names[i], h->scores[i]);
                 else
@@ -404,9 +404,9 @@ void render_highscore(Highscore *h, SDL_Renderer *renderer)
     }
 }
 
-/* ------------------------------------------------------------------ */
-/*  EVENT HANDLING                                                      */
-/* ------------------------------------------------------------------ */
+
+
+
 
 void handle_highscore_event(Highscore *h, SDL_Event event, int *running)
 {
@@ -416,7 +416,7 @@ void handle_highscore_event(Highscore *h, SDL_Event event, int *running)
 
     if (event.type == SDL_QUIT) { *running = 0; return; }
 
-    /* Mouse hover */
+    
     if (event.type == SDL_MOUSEMOTION) {
         mx = event.motion.x;
         my = event.motion.y;
@@ -428,7 +428,7 @@ void handle_highscore_event(Highscore *h, SDL_Event event, int *running)
         }
     }
 
-    /* Mouse click */
+    
     if (event.type == SDL_MOUSEBUTTONDOWN &&
         event.button.button == SDL_BUTTON_LEFT) {
         p.x = event.button.x;
@@ -447,7 +447,7 @@ void handle_highscore_event(Highscore *h, SDL_Event event, int *running)
         }
     }
 
-    /* Keyboard */
+    
     if (event.type == SDL_KEYDOWN) {
         key = event.key.keysym.sym;
         if (key == SDLK_ESCAPE) { Mix_HaltMusic(); *running = 0; }
@@ -460,15 +460,15 @@ void handle_highscore_event(Highscore *h, SDL_Event event, int *running)
         }
     }
 
-    /* Text input */
+    
     if (event.type == SDL_TEXTINPUT && h->interface == 0)
         if (strlen(h->playerName) < 49)
             strcat(h->playerName, event.text.text);
 }
 
-/* ------------------------------------------------------------------ */
-/*  FREE                                                                */
-/* ------------------------------------------------------------------ */
+
+
+
 
 void free_highscore(Highscore *h)
 {

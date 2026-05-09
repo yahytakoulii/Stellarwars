@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['gametimer_113',['GameTimer',['../structGameTimer.html',1,'']]],
-  ['guide_114',['Guide',['../structGuide.html',1,'']]]
+  ['characterdefinition_0',['CharacterDefinition',['../structCharacterDefinition.html',1,'']]],
+  ['characterselection_1',['CharacterSelection',['../structCharacterSelection.html',1,'']]]
 ];

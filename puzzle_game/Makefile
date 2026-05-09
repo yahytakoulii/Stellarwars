@@ -16,12 +16,6 @@ LDFLAGS = $(shell sdl2-config --libs) \
           -lSDL2_ttf \
           -lm
 
-# Optional: build with SDL2_mixer sound support
-# Uncomment the two lines below to enable sound:
-# CFLAGS  += -DUSE_MIXER
-# LDFLAGS += -lSDL2_mixer
-
-# ---- Rules ------------------------------------------------- #
 
 all: $(TARGET)
 

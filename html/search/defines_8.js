@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['save_5fdir_0',['SAVE_DIR',['../save__system_8h.html#a077f5ae49c80f04eb4c522030fd8a197',1,'save_system.h']]],
+  ['save_5fmagic_1',['SAVE_MAGIC',['../save__system_8c.html#aa355db1b4db1422d523d7e14f78b70bf',1,'save_system.c']]],
+  ['save_5fmenu_5fbg_2',['SAVE_MENU_BG',['../save__system_8c.html#a8f8b3ec36c33a2fde758a57f2517495a',1,'save_system.c']]],
+  ['save_5fmenu_5fhover_3',['SAVE_MENU_HOVER',['../save__system_8c.html#ace80f2b4b467579280e0261bc8f49402',1,'save_system.c']]],
+  ['save_5fmenu_5fload_4',['SAVE_MENU_LOAD',['../save__system_8c.html#a38c5d9773958478a9ddf93295206f232',1,'save_system.c']]],
+  ['save_5fmenu_5fnew_5',['SAVE_MENU_NEW',['../save__system_8c.html#a2741d3a7e3e68f78c9d2ccaced217dba',1,'save_system.c']]],
+  ['save_5fmenu_5fno_6',['SAVE_MENU_NO',['../save__system_8c.html#a846e96cb3734c856262631f6901ef5ec',1,'save_system.c']]],
+  ['save_5fmenu_5fyes_7',['SAVE_MENU_YES',['../save__system_8c.html#a7409f72604977d5b43a9e0ec324d74a2',1,'save_system.c']]],
+  ['save_5fpath_5fmax_8',['SAVE_PATH_MAX',['../save__system_8h.html#a4b5771592ff1fccce84359637546a043',1,'save_system.h']]],
+  ['save_5fversion_9',['SAVE_VERSION',['../save__system_8c.html#a620a7acb504c4732c7665915295be27c',1,'save_system.c']]],
+  ['screen_5fh_10',['SCREEN_H',['../header_8h.html#a27cddfd509d28b4b2b0b44c093fac090',1,'header.h']]],
+  ['screen_5fw_11',['SCREEN_W',['../header_8h.html#a9b6bc9242882d1e758e06ed751a2e8ec',1,'header.h']]],
+  ['scroll_5fspeed_12',['SCROLL_SPEED',['../background_8h.html#a4e7c3fad71f0d2ad019992d63364194e',1,'background.h']]],
+  ['sfx_5ffail_5fpath_13',['SFX_FAIL_PATH',['../assets_8h.html#a4a1c28d83eff04ee0249cd03e653b35d',1,'assets.h']]],
+  ['sfx_5fpick_5fpath_14',['SFX_PICK_PATH',['../assets_8h.html#a4fdcb60431a911113ced5bfcd1d26ee3',1,'assets.h']]],
+  ['sfx_5fsuccess_5fpath_15',['SFX_SUCCESS_PATH',['../assets_8h.html#a135d810233fe121d4f5470be038499b6',1,'assets.h']]],
+  ['ship_5fend_5fx_16',['SHIP_END_X',['../header_8h.html#a7f7910452912fca68cc24b258491b18d',1,'header.h']]],
+  ['ship_5fground_5fsurface_5foffset_17',['SHIP_GROUND_SURFACE_OFFSET',['../header_8h.html#a6f156b095310c3c3752963055367f7dc',1,'header.h']]],
+  ['stable_5fplatform_5fcount_18',['STABLE_PLATFORM_COUNT',['../header_8h.html#a6945945a18c5f5b9bf6ff4c9e7cfc754',1,'header.h']]]
+];

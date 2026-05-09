@@ -1,9 +1,25 @@
 var searchData=
 [
-  ['background_6',['Background',['../structBackground.html',1,'']]],
-  ['background_2ec_7',['background.c',['../background_8c.html',1,'']]],
-  ['background_2eh_8',['background.h',['../background_8h.html',1,'']]],
-  ['bullet_9',['Bullet',['../structBullet.html',1,'']]],
-  ['button_10',['Button',['../structButton.html',1,'']]],
-  ['button_5fclicked_11',['button_clicked',['../background_8c.html#ad00b2cdd64871ad2668327068e6ba713',1,'button_clicked(Button *btn, int mx, int my):&#160;background.c'],['../background_8h.html#ad00b2cdd64871ad2668327068e6ba713',1,'button_clicked(Button *btn, int mx, int my):&#160;background.c']]]
+  ['back_0',['back',['../structHighscore.html#a81f7c202e3b87554ee90aa7cc118ef03',1,'Highscore']]],
+  ['background_1',['background',['../structMainMenu.html#aa2e805cc032ce6128b4c9cfcbdd709b8',1,'MainMenu::background'],['../structSaveMenuVisuals.html#aa69f2dba77a0617e4ba35eb7235cc486',1,'SaveMenuVisuals::background'],['../structBackground.html',1,'Background']]],
+  ['background_2ec_2',['background.c',['../background_8c.html',1,'']]],
+  ['background_2eh_3',['background.h',['../background_8h.html',1,'']]],
+  ['background_5fentry_4',['background_entry',['../structHighscore.html#aad2a72e253194ccd227a784367f79ad9',1,'Highscore']]],
+  ['background_5fmain_2ec_5',['background_main.c',['../background__main_8c.html',1,'']]],
+  ['background_5fscores_6',['background_scores',['../structHighscore.html#ac288a385d0f3cf982a85926185828325',1,'Highscore']]],
+  ['bg_5fimage_5fcount_7',['BG_IMAGE_COUNT',['../assets_8h.html#ab6edf54bbd225203f49e0830656d279c',1,'assets.h']]],
+  ['bg_5fimage_5fpaths_8',['BG_IMAGE_PATHS',['../assets_8h.html#a86c110a7967395effa3481af8eb03bc7',1,'assets.h']]],
+  ['bloquerdessousplateforme_9',['bloquerDessousPlateforme',['../main_8c.html#a336f751168c699457c07e9c3616ec001',1,'main.c']]],
+  ['build_5fpuzzle_5ftex_10',['build_puzzle_tex',['../game_8c.html#a693aa61d94fc1e5ef02a5f9d7799ced4',1,'game.c']]],
+  ['build_5fround_11',['build_round',['../game_8c.html#a7fee181893304f3ecbe459d83f69a594',1,'game.c']]],
+  ['bullet_12',['Bullet',['../structBullet.html',1,'']]],
+  ['bullet_5fh_13',['BULLET_H',['../header_8h.html#a229b3fb9bc91a44904a7a82d990e1ec4',1,'header.h']]],
+  ['bullet_5fspeed_14',['BULLET_SPEED',['../header_8h.html#a70b3e643b533b8f785b7912e69434161',1,'header.h']]],
+  ['bullet_5fw_15',['BULLET_W',['../header_8h.html#aea3dc52734d56e23aa351d964f920a1d',1,'header.h']]],
+  ['bulletcount_16',['bulletCount',['../structSaveData.html#a3aefc48d6ea2071bde7311c38d55b4c0',1,'SaveData']]],
+  ['bullets_17',['bullets',['../structSaveData.html#af72f286cf47aa9ab1556aa1decfa5b2c',1,'SaveData']]],
+  ['button_18',['button',['../structUiAssets.html#a108527e21ffd7f3584dc8fc764fe7295',1,'UiAssets::button'],['../structButton.html',1,'Button']]],
+  ['button_5fclicked_19',['button_clicked',['../background_8c.html#ad00b2cdd64871ad2668327068e6ba713',1,'button_clicked(Button *btn, int mx, int my):&#160;background.c'],['../background_8h.html#ad00b2cdd64871ad2668327068e6ba713',1,'button_clicked(Button *btn, int mx, int my):&#160;background.c']]],
+  ['buttonprimary_20',['buttonPrimary',['../structUiAssets.html#a1ab894ff036300737e1d7e660acaf5af',1,'UiAssets']]],
+  ['buttons_21',['buttons',['../structMainMenu.html#a36b657c6ff4c226231ffbbbb21e11103',1,'MainMenu']]]
 ];

@@ -1,10 +1,4 @@
 var searchData=
 [
-  ['rect_79',['rect',['../structPlatform.html#ad556a4d782572800855723ced196cadd',1,'Platform::rect()'],['../structBullet.html#addc6dd4fce8e6202e68c6e539ab4eac5',1,'Bullet::rect()']]],
-  ['render_5fbackground_80',['render_background',['../background_8c.html#a8b558b190520a882e13d4bdef3673faf',1,'render_background(Background *bg, SDL_Renderer *renderer):&#160;background.c'],['../background_8h.html#a8b558b190520a882e13d4bdef3673faf',1,'render_background(Background *bg, SDL_Renderer *renderer):&#160;background.c']]],
-  ['render_5fbutton_81',['render_button',['../background_8c.html#a20290e0e5952b30a1bfcb22d87b7b238',1,'render_button(Button *btn, SDL_Renderer *renderer, TTF_Font *font, const char *label):&#160;background.c'],['../background_8h.html#a20290e0e5952b30a1bfcb22d87b7b238',1,'render_button(Button *btn, SDL_Renderer *renderer, TTF_Font *font, const char *label):&#160;background.c']]],
-  ['render_5fguide_82',['render_guide',['../background_8c.html#a19729a54eef4450ea36ad09790273166',1,'render_guide(Guide *g, SDL_Renderer *renderer, TTF_Font *font, int offsetX, int maxW):&#160;background.c'],['../background_8h.html#a19729a54eef4450ea36ad09790273166',1,'render_guide(Guide *g, SDL_Renderer *renderer, TTF_Font *font, int offsetX, int maxW):&#160;background.c']]],
-  ['render_5fplatforms_83',['render_platforms',['../background_8c.html#a6a464280b17612865babec5d2b024890',1,'render_platforms(Background *bg, SDL_Renderer *renderer):&#160;background.c'],['../background_8h.html#a6a464280b17612865babec5d2b024890',1,'render_platforms(Background *bg, SDL_Renderer *renderer):&#160;background.c']]],
-  ['render_5ftimer_84',['render_timer',['../background_8c.html#a8694ee546fba3815eebed2504656de4a',1,'render_timer(GameTimer *t, SDL_Renderer *renderer, TTF_Font *font, int centerX, int y):&#160;background.c'],['../background_8h.html#a8694ee546fba3815eebed2504656de4a',1,'render_timer(GameTimer *t, SDL_Renderer *renderer, TTF_Font *font, int centerX, int y):&#160;background.c']]],
-  ['rows_85',['rows',['../structAnimation.html#a33b85e3af623bbdecaa2e3fb66bbffc5',1,'Animation']]]
+  ['quit_0',['quit',['../structHighscore.html#aa0add8f655dbbb87bd76d0f3f0dbed8d',1,'Highscore']]]
 ];

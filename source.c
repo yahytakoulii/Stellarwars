@@ -1,5 +1,13 @@
 #include "header.h"
 
+#define STELLAR_MUSIC_PATH "stellar wars level 1 and menu .wav"
+#define STELLAR_MENU_LOOP_MS 40000
+#define STELLAR_GAME_LOOP_START_SEC 110.0
+
+static Mix_Music *stellarMusic = NULL;
+static Uint32 stellarMusicSegmentStartedAt = 0;
+static int stellarMusicMode = 0;
+
 int collisionAABB(SDL_Rect a, SDL_Rect b)
 {
     if (a.x + a.w <= b.x)
@@ -40,10 +48,74 @@ static SDL_Rect getNPCGroundedDrawRect(NPC *npc, int w, int h)
     SDL_Rect drawRect;
 
     drawRect.x = npc->dstRect.x;
-    drawRect.y = npc->dstRect.y + npc->dstRect.h - h;
+    drawRect.y = npc->dstRect.y + npc->dstRect.h - h + NPC_VISUAL_GROUND_OFFSET;
     drawRect.w = w;
     drawRect.h = h;
     return drawRect;
+}
+
+static int npcBaseGroundY(NPC *npc)
+{
+    return npc->groundY + PLAYER_H - npc->h;
+}
+
+static int npcPlatformFloorY(NPC *npc, SDL_Rect platform, int currentFloor)
+{
+    int npcBottom = (int)(npc->y + npc->h);
+
+    if (npc->x + npc->w <= platform.x || npc->x >= platform.x + platform.w)
+        return currentFloor;
+
+    if (npcBottom <= platform.y + 18 && platform.y - npc->h < currentFloor)
+        return platform.y - npc->h;
+
+    return currentFloor;
+}
+
+static int getNPCFloorY(NPC *npc,
+                        SDL_Rect stablePlatforms[], int stableCount,
+                        SDL_Rect movingPlatforms[], int movingCount)
+{
+    int floorY = npcBaseGroundY(npc);
+    int i;
+
+    for (i = 0; i < stableCount; i++)
+        floorY = npcPlatformFloorY(npc, stablePlatforms[i], floorY);
+
+    for (i = 0; i < movingCount; i++)
+        floorY = npcPlatformFloorY(npc, movingPlatforms[i], floorY);
+
+    return floorY;
+}
+
+static int npcIsInsideView(NPC *npc, int cameraX, int viewW)
+{
+    int npcLeft = (int)npc->x;
+    int npcRight = npcLeft + npc->w;
+    int viewRight = cameraX + viewW;
+
+    return npcRight > cameraX && npcLeft < viewRight;
+}
+
+static void maybeJumpNPC(NPC *npc, Joueur *player, int swarmAlerted, Uint32 now)
+{
+    if (!npc->onGround || now < npc->nextJumpAt)
+        return;
+
+    if (swarmAlerted && player != NULL && player->posScreen.y + player->posScreen.h < npc->dstRect.y + npc->dstRect.h - 28)
+    {
+        npc->velY = ENEMY_JUMP_FORCE;
+        npc->onGround = 0;
+        npc->nextJumpAt = now + ENEMY_JUMP_COOLDOWN;
+        return;
+    }
+
+    if (!swarmAlerted && (rand() % 100) < ENEMY_RANDOM_JUMP_CHANCE)
+    {
+        npc->velY = ENEMY_JUMP_FORCE;
+        npc->onGround = 0;
+        npc->nextJumpAt = now + ENEMY_JUMP_COOLDOWN;
+    }
 }
 
 int initSDL(SDL_Window **window, SDL_Renderer **renderer)
@@ -119,6 +191,8 @@ int initSDL(SDL_Window **window, SDL_Renderer **renderer)
 
 void shutdownSDL(SDL_Window *window, SDL_Renderer *renderer)
 {
+    stellarMusicStop();
+
     if (renderer != NULL)
         SDL_DestroyRenderer(renderer);
 
@@ -129,6 +203,95 @@ void shutdownSDL(SDL_Window *window, SDL_Renderer *renderer)
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+}
+
+static int stellarMusicEnsureLoaded(void)
+{
+    if (stellarMusic != NULL)
+        return 1;
+
+    stellarMusic = Mix_LoadMUS(STELLAR_MUSIC_PATH);
+    if (stellarMusic == NULL)
+    {
+        printf("[ERREUR] Mix_LoadMUS %s : %s\n", STELLAR_MUSIC_PATH, Mix_GetError());
+        return 0;
+    }
+
+    return 1;
+}
+
+static void stellarMusicSeek(double seconds)
+{
+    if (Mix_SetMusicPosition(seconds) != 0)
+        printf("[ERREUR] Mix_SetMusicPosition %.2f : %s\n", seconds, Mix_GetError());
+}
+
+void stellarMusicStartMenu(void)
+{
+    if (!stellarMusicEnsureLoaded())
+        return;
+
+    stellarMusicMode = 1;
+    if (!Mix_PlayingMusic())
+        Mix_PlayMusic(stellarMusic, 0);
+    stellarMusicSeek(0.0);
+    stellarMusicSegmentStartedAt = SDL_GetTicks();
+}
+
+void stellarMusicUpdateMenu(void)
+{
+    Uint32 now;
+
+    if (stellarMusicMode != 1 || stellarMusic == NULL)
+        return;
+
+    now = SDL_GetTicks();
+    if (!Mix_PlayingMusic() || now - stellarMusicSegmentStartedAt >= STELLAR_MENU_LOOP_MS)
+    {
+        Mix_PlayMusic(stellarMusic, 0);
+        stellarMusicSeek(0.0);
+        stellarMusicSegmentStartedAt = now;
+    }
+}
+
+void stellarMusicStartGameplay(void)
+{
+    if (!stellarMusicEnsureLoaded())
+        return;
+
+    stellarMusicMode = 2;
+    if (!Mix_PlayingMusic())
+    {
+        Mix_PlayMusic(stellarMusic, 0);
+        stellarMusicSeek(STELLAR_GAME_LOOP_START_SEC);
+    }
+    stellarMusicSegmentStartedAt = SDL_GetTicks();
+}
+
+void stellarMusicUpdateGameplay(void)
+{
+    if (stellarMusicMode != 2 || stellarMusic == NULL)
+        return;
+
+    if (!Mix_PlayingMusic())
+    {
+        Mix_PlayMusic(stellarMusic, 0);
+        stellarMusicSeek(STELLAR_GAME_LOOP_START_SEC);
+        stellarMusicSegmentStartedAt = SDL_GetTicks();
+    }
+}
+
+void stellarMusicStop(void)
+{
+    if (stellarMusic != NULL)
+    {
+        Mix_HaltMusic();
+        Mix_FreeMusic(stellarMusic);
+        stellarMusic = NULL;
+    }
+
+    stellarMusicMode = 0;
+    stellarMusicSegmentStartedAt = 0;
 }
 
 void initNPC(NPC *npc, SDL_Renderer *renderer)
@@ -191,6 +354,9 @@ void initNPC(NPC *npc, SDL_Renderer *renderer)
     npc->frameDelay = 170;
     npc->attackStartedAt = 0;
     npc->nextAttackAt = 0;
+    npc->velY = 0.0f;
+    npc->onGround = 1;
+    npc->nextJumpAt = SDL_GetTicks() + (Uint32)(rand() % ENEMY_JUMP_COOLDOWN);
 }
 
 void destroyNPC(NPC *npc)
@@ -209,9 +375,233 @@ void destroyNPC(NPC *npc)
     npc->dieTexture = NULL;
 }
 
-void updateNPC(NPC *npc)
+void removeNPCFromPlay(NPC *npc)
+{
+    npc->state = ENEMY_REMOVED;
+    npc->health = 0;
+    npc->action = 0;
+    npc->velY = 0.0f;
+    npc->onGround = 1;
+    npc->dstRect.x = 0;
+    npc->dstRect.y = 0;
+    npc->dstRect.w = 0;
+    npc->dstRect.h = 0;
+}
+
+void spawnNPCFromSide(NPC *npc, int side)
+{
+    int edgePadding = 70 + rand() % 90;
+
+    if (side < 0)
+    {
+        npc->x = (float)(SHIP_END_X + edgePadding);
+        npc->direction = 0;
+    }
+    else
+    {
+        npc->x = (float)(WORLD_W - npc->w - edgePadding);
+        npc->direction = 1;
+    }
+
+    npc->groundY = MARS_GROUND_Y;
+    npc->y = (float)npcBaseGroundY(npc);
+    npc->posMin = (int)npc->x - 180;
+    npc->posMax = (int)npc->x + 180;
+
+    if (npc->posMin < SHIP_END_X)
+        npc->posMin = SHIP_END_X;
+    if (npc->posMax > WORLD_W - npc->w)
+        npc->posMax = WORLD_W - npc->w;
+
+    npc->action = 0;
+    npc->health = ENEMY_HEALTH_MAX;
+    npc->maxHealth = ENEMY_HEALTH_MAX;
+    npc->state = ENEMY_ALIVE;
+    npc->lastFrameTime = 0;
+    npc->attackStartedAt = 0;
+    npc->nextAttackAt = 0;
+    npc->velY = 0.0f;
+    npc->onGround = 1;
+    npc->nextJumpAt = SDL_GetTicks() + (Uint32)(rand() % ENEMY_JUMP_COOLDOWN);
+    setNPCWalkFrame(npc);
+
+    npc->dstRect.x = (int)npc->x;
+    npc->dstRect.y = (int)npc->y;
+    npc->dstRect.w = npc->w;
+    npc->dstRect.h = npc->h;
+}
+
+void spawnNPCInWave(NPC *npc, int index, int total, int avoidX, int avoidW)
+{
+    int spawnMin = 160;
+    int spawnMax = WORLD_W - npc->w - 130;
+    int usableWidth;
+    int slotWidth;
+    int slotCenter;
+    int jitterRange;
+    int jitter;
+    int patrolReach;
+    int avoidMin;
+    int avoidMax;
+    int leftSpace;
+    int rightSpace;
+
+    if (total <= 0)
+    {
+        spawnNPCFromSide(npc, (rand() % 2 == 0) ? -1 : 1);
+        return;
+    }
+
+    if (index < 0)
+        index = 0;
+    if (index >= total)
+        index = total - 1;
+
+    if (spawnMax <= spawnMin)
+    {
+        spawnNPCFromSide(npc, (index % 2 == 0) ? -1 : 1);
+        return;
+    }
+
+    usableWidth = spawnMax - spawnMin;
+    slotWidth = usableWidth / total;
+    if (slotWidth < 1)
+        slotWidth = 1;
+
+    slotCenter = spawnMin + slotWidth * index + slotWidth / 2;
+    jitterRange = slotWidth / 5;
+    if (jitterRange > 35)
+        jitterRange = 35;
+
+    jitter = 0;
+    if (jitterRange > 0)
+    {
+        jitter = rand() % (jitterRange + 1);
+        if (index % 2 == 0)
+            jitter = -jitter;
+    }
+
+    npc->x = (float)(slotCenter + jitter);
+    if (npc->x < spawnMin)
+        npc->x = (float)spawnMin;
+    if (npc->x > spawnMax)
+        npc->x = (float)spawnMax;
+
+    if (avoidW > 0)
+    {
+        avoidMin = avoidX - 260;
+        avoidMax = avoidX + avoidW + 260;
+        leftSpace = avoidMin - spawnMin;
+        rightSpace = spawnMax - avoidMax;
+
+        if ((int)npc->x + npc->w > avoidMin && (int)npc->x < avoidMax)
+        {
+            if ((index % 2 == 0 && leftSpace > npc->w) || rightSpace <= npc->w)
+            {
+                int leftCount = total / 2 + total % 2;
+                int leftSlot = leftSpace / leftCount;
+                int leftIndex = index / 2;
+
+                if (leftSlot < 1)
+                    leftSlot = 1;
+                npc->x = (float)(spawnMin + leftSlot * leftIndex + leftSlot / 2);
+            }
+            else if (rightSpace > npc->w)
+            {
+                int rightCount = total / 2;
+                int rightSlot;
+                int rightIndex = index / 2;
+
+                if (rightCount < 1)
+                    rightCount = 1;
+                rightSlot = rightSpace / rightCount;
+                if (rightSlot < 1)
+                    rightSlot = 1;
+                npc->x = (float)(avoidMax + rightSlot * rightIndex + rightSlot / 2);
+            }
+
+            if (npc->x < spawnMin)
+                npc->x = (float)spawnMin;
+            if (npc->x > spawnMax)
+                npc->x = (float)spawnMax;
+        }
+    }
+
+    npc->direction = (index % 2 == 0) ? 0 : 1;
+    if ((int)npc->x >= SHIP_END_X)
+        npc->groundY = MARS_GROUND_Y;
+    else
+        npc->groundY = GROUND_Y;
+    npc->y = (float)npcBaseGroundY(npc);
+
+    patrolReach = 145 + rand() % 120;
+    npc->posMin = (int)npc->x - patrolReach;
+    npc->posMax = (int)npc->x + patrolReach;
+
+    if (npc->posMin < 0)
+        npc->posMin = 0;
+    if (npc->posMax > WORLD_W - npc->w)
+        npc->posMax = WORLD_W - npc->w;
+
+    npc->action = 0;
+    npc->health = ENEMY_HEALTH_MAX;
+    npc->maxHealth = ENEMY_HEALTH_MAX;
+    npc->state = ENEMY_ALIVE;
+    npc->lastFrameTime = 0;
+    npc->attackStartedAt = 0;
+    npc->nextAttackAt = 0;
+    npc->velY = 0.0f;
+    npc->onGround = 1;
+    npc->nextJumpAt = SDL_GetTicks() + (Uint32)(rand() % ENEMY_JUMP_COOLDOWN);
+    setNPCWalkFrame(npc);
+
+    npc->dstRect.x = (int)npc->x;
+    npc->dstRect.y = (int)npc->y;
+    npc->dstRect.w = npc->w;
+    npc->dstRect.h = npc->h;
+}
+
+int npcCanSeePlayer(NPC *npc, Joueur *player)
+{
+    int npcCenter;
+    int playerCenter;
+    int distance;
+
+    if (!isNPCActive(npc) || player == NULL || !player->alive || !player->visible)
+        return 0;
+
+    npcCenter = npc->dstRect.x + npc->dstRect.w / 2;
+    playerCenter = player->posScreen.x + player->posScreen.w / 2;
+    distance = playerCenter - npcCenter;
+
+    if (distance < 0)
+        distance = -distance;
+
+    if (distance > ENEMY_DETECTION_RANGE)
+        return 0;
+
+    if (player->posScreen.y + player->posScreen.h <= npc->dstRect.y + 12 ||
+        player->posScreen.y >= npc->dstRect.y + npc->dstRect.h)
+        return 0;
+
+    if (npc->direction == 0 && playerCenter < npcCenter)
+        return 0;
+    if (npc->direction != 0 && playerCenter > npcCenter)
+        return 0;
+
+    return 1;
+}
+
+void updateNPC(NPC *npc, Joueur *player, int swarmAlerted,
+               int cameraX, int viewW,
+               SDL_Rect stablePlatforms[], int stableCount,
+               SDL_Rect movingPlatforms[], int movingCount)
 {
     Uint32 now = SDL_GetTicks();
+    int floorY;
+    int npcCenter;
+    int playerCenter;
+    int canChase;
 
     if (npc->state == ENEMY_REMOVED)
         return;
@@ -234,12 +624,7 @@ void updateNPC(NPC *npc)
                     npc->action++;
                 else
                 {
-                    destroyNPC(npc);
-                    npc->dstRect.x = 0;
-                    npc->dstRect.y = 0;
-                    npc->dstRect.w = 0;
-                    npc->dstRect.h = 0;
-                    npc->state = ENEMY_REMOVED;
+                    removeNPCFromPlay(npc);
                     return;
                 }
             }
@@ -251,7 +636,7 @@ void updateNPC(NPC *npc)
         }
 
         npc->dstRect.x = (int)npc->x;
-        npc->dstRect.y = npc->groundY + PLAYER_H - npc->h;
+        npc->dstRect.y = (int)npc->y;
         npc->dstRect.w = npc->w;
         npc->dstRect.h = npc->h;
         return;
@@ -293,24 +678,67 @@ void updateNPC(NPC *npc)
         }
 
         npc->dstRect.x = (int)npc->x;
-        npc->dstRect.y = npc->groundY + PLAYER_H - npc->h;
+        npc->dstRect.y = (int)npc->y;
         npc->dstRect.w = npc->w;
         npc->dstRect.h = npc->h;
         return;
     }
 
-    if ((int)npc->x > npc->posMax)
-        npc->direction = 1;
+    canChase = swarmAlerted &&
+               npcIsInsideView(npc, cameraX, viewW) &&
+               player != NULL &&
+               player->alive &&
+               player->visible;
 
-    if ((int)npc->x < npc->posMin)
-        npc->direction = 0;
+    if (canChase)
+    {
+        npcCenter = (int)npc->x + npc->w / 2;
+        playerCenter = player->posScreen.x + player->posScreen.w / 2;
 
-    if (npc->direction == 0)
-        npc->x++;
+        if (playerCenter >= npcCenter)
+        {
+            npc->direction = 0;
+            npc->x += ENEMY_CHASE_SPEED;
+        }
+        else
+        {
+            npc->direction = 1;
+            npc->x -= ENEMY_CHASE_SPEED;
+        }
+    }
     else
-        npc->x--;
+    {
+        if ((int)npc->x > npc->posMax)
+            npc->direction = 1;
 
-    npc->y = npc->groundY + PLAYER_H - npc->h;
+        if ((int)npc->x < npc->posMin)
+            npc->direction = 0;
+
+        if (npc->direction == 0)
+            npc->x += ENEMY_PATROL_SPEED;
+        else
+            npc->x -= ENEMY_PATROL_SPEED;
+    }
+
+    if (npc->x < 0)
+        npc->x = 0;
+    if (npc->x + npc->w > WORLD_W)
+        npc->x = WORLD_W - npc->w;
+
+    maybeJumpNPC(npc, player, canChase, now);
+
+    floorY = getNPCFloorY(npc, stablePlatforms, stableCount, movingPlatforms, movingCount);
+    npc->velY += ENEMY_GRAVITY;
+    npc->y += npc->velY;
+
+    if (npc->y >= floorY)
+    {
+        npc->y = (float)floorY;
+        npc->velY = 0.0f;
+        npc->onGround = 1;
+    }
+    else
+        npc->onGround = 0;
 
     if (npc->useSprite && now - npc->lastFrameTime >= npc->frameDelay)
     {

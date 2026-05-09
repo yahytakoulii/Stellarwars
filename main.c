@@ -1,28 +1,12 @@
-/**
-* @file main.c
-* @brief Main program for the Pfinal SDL game.
-* @author C Team
-* @version 0.1
-* @date May 02, 2026
-*
-* Main program for player control, scrolling world rendering, enemies,
-* minimap display, puzzle challenge, and highscore screen.
-*/
+
 
 #include "header.h"
 #include "highscore.h"
+#include "main_menu.h"
 #include "minimap/minimap.h"
 #include "save_system.h"
 
-/**
-* @brief To show the player heads-up display.
-* @param renderer the SDL renderer
-* @param font the font used for the score text
-* @param J1 the first player
-* @param J2 the second player
-* @param joueurActif the active player number
-* @return Nothing
-*/
+
 static void afficherHUD(SDL_Renderer *renderer, TTF_Font *font,
                         Joueur *J1, Joueur *J2, int joueurActif)
 {
@@ -88,10 +72,7 @@ static void afficherHUD(SDL_Renderer *renderer, TTF_Font *font,
     }
 }
 
-/**
-* @brief To launch the puzzle challenge.
-* @return 1 if the challenge is won, 0 otherwise
-*/
+
 static int lancerChallengePuzzle(void)
 {
     int round;
@@ -104,27 +85,14 @@ static int lancerChallengePuzzle(void)
     return wins >= PUZZLE_CHALLENGE_REQUIRED;
 }
 
-/**
-* @brief To save the current game progress.
-* @param J1 the first player
-* @param J2 the second player
-* @param bullets the bullets
-* @param npcs the enemies
-* @param stablePlatforms the stable platforms
-* @param movingPlatforms the moving platforms
-* @param movingDir the moving platform directions
-* @param movingMin the moving platform minimum positions
-* @param movingMax the moving platform maximum positions
-* @param joueurActif the active player number
-* @param puzzleChallengeUsed the puzzle challenge state
-* @return 1 if the save succeeds, 0 otherwise
-*/
+
 static int sauvegarderProgression(Joueur *J1, Joueur *J2,
                                   Bullet bullets[], NPC npcs[],
                                   SDL_Rect stablePlatforms[],
                                   SDL_Rect movingPlatforms[],
                                   int movingDir[], int movingMin[], int movingMax[],
                                   int joueurActif, int puzzleChallengeUsed,
+                                  int multiplayerMode,
                                   SDL_Renderer *renderer, TTF_Font *font)
 {
     char savePath[SAVE_PATH_MAX];
@@ -143,27 +111,17 @@ static int sauvegarderProgression(Joueur *J1, Joueur *J2,
                            stablePlatforms, STABLE_PLATFORM_COUNT,
                            movingPlatforms, MOVING_PLATFORM_COUNT,
                            movingDir, movingMin, movingMax,
-                           joueurActif, puzzleChallengeUsed);
+                           joueurActif, puzzleChallengeUsed,
+                           multiplayerMode);
 }
 
-/**
-* @brief To check horizontal overlap between a player and a platform.
-* @param player the player rectangle
-* @param platform the platform rectangle
-* @return 1 if the rectangles overlap horizontally, 0 otherwise
-*/
+
 static int chevaucheHorizontalement(SDL_Rect player, SDL_Rect platform)
 {
     return player.x + player.w > platform.x && player.x < platform.x + platform.w;
 }
 
-/**
-* @brief To stop the player from crossing a platform from below.
-* @param J the player
-* @param previous the player rectangle before the movement update
-* @param platform the platform rectangle
-* @return Nothing
-*/
+
 static void bloquerDessousPlateforme(Joueur *J, SDL_Rect previous, SDL_Rect platform)
 {
     int platformBottom = platform.y + platform.h;
@@ -182,14 +140,7 @@ static void bloquerDessousPlateforme(Joueur *J, SDL_Rect previous, SDL_Rect plat
     }
 }
 
-/**
-* @brief To apply platform underside collision to the player.
-* @param J the player
-* @param previous the player rectangle before the movement update
-* @param stablePlatforms the stable platforms
-* @param movingPlatforms the moving platforms
-* @return Nothing
-*/
+
 static void appliquerCollisionDessousPlateformes(Joueur *J, SDL_Rect previous,
                                                  SDL_Rect stablePlatforms[],
                                                  SDL_Rect movingPlatforms[])
@@ -203,18 +154,183 @@ static void appliquerCollisionDessousPlateformes(Joueur *J, SDL_Rect previous,
         bloquerDessousPlateforme(J, previous, movingPlatforms[p]);
 }
 
-/**
-* @brief To draw the debug rectangles for player and platforms.
-* @param renderer the SDL renderer
-* @param J1 the first player
-* @param J2 the second player
-* @param cameraX the camera horizontal offset
-* @param shipGround the ship ground collision rectangle
-* @param marsGround the Mars ground collision rectangle
-* @param stablePlatforms the stable platform collision rectangles
-* @param movingPlatforms the moving platform collision rectangles
-* @return Nothing
-*/
+static void alignerSolVisuel(SDL_Rect *ground, SDL_Texture *texture,
+                             int floorLine, int surfaceOffset)
+{
+    int texW;
+    int texH;
+    int visibleBelowSurface;
+
+    ground->y = floorLine;
+    ground->h = SCREEN_H - floorLine;
+
+    if (texture == NULL)
+        return;
+
+    if (SDL_QueryTexture(texture, NULL, NULL, &texW, &texH) != 0)
+        return;
+
+    visibleBelowSurface = texH - surfaceOffset;
+    if (visibleBelowSurface <= 0)
+        return;
+
+    ground->h = ((SCREEN_H - floorLine) * texH + visibleBelowSurface - 1) /
+                visibleBelowSurface;
+    ground->y = floorLine - (surfaceOffset * ground->h) / texH;
+}
+
+static int phasePNJTerminee(NPC npcs[])
+{
+    int i;
+
+    for (i = 0; i < MAX_NPCS; i++)
+        if (npcs[i].state != ENEMY_REMOVED)
+            return 0;
+
+    return 1;
+}
+
+static void separerPNJEntasses(NPC npcs[])
+{
+    int i;
+    int j;
+
+    for (i = 0; i < MAX_NPCS; i++)
+    {
+        if (!isNPCActive(&npcs[i]))
+            continue;
+
+        for (j = i + 1; j < MAX_NPCS; j++)
+        {
+            int centerI;
+            int centerJ;
+            int distance;
+            int minSpacing;
+            int push;
+
+            if (!isNPCActive(&npcs[j]))
+                continue;
+
+            if (npcs[i].dstRect.y + npcs[i].dstRect.h <= npcs[j].dstRect.y ||
+                npcs[j].dstRect.y + npcs[j].dstRect.h <= npcs[i].dstRect.y)
+                continue;
+
+            centerI = (int)npcs[i].x + npcs[i].w / 2;
+            centerJ = (int)npcs[j].x + npcs[j].w / 2;
+            distance = centerJ - centerI;
+            if (distance < 0)
+                distance = -distance;
+
+            minSpacing = (npcs[i].w + npcs[j].w) / 2 + 24;
+            if (distance >= minSpacing)
+                continue;
+
+            push = (minSpacing - distance + 1) / 2;
+            if (centerI <= centerJ)
+            {
+                npcs[i].x -= push;
+                npcs[j].x += push;
+            }
+            else
+            {
+                npcs[i].x += push;
+                npcs[j].x -= push;
+            }
+
+            if (npcs[i].x < 0)
+                npcs[i].x = 0.0f;
+            if (npcs[j].x < 0)
+                npcs[j].x = 0.0f;
+            if (npcs[i].x + npcs[i].w > WORLD_W)
+                npcs[i].x = (float)(WORLD_W - npcs[i].w);
+            if (npcs[j].x + npcs[j].w > WORLD_W)
+                npcs[j].x = (float)(WORLD_W - npcs[j].w);
+
+            npcs[i].dstRect.x = (int)npcs[i].x;
+            npcs[j].dstRect.x = (int)npcs[j].x;
+        }
+    }
+}
+
+static void lancerPhasePNJ(NPC npcs[], int phaseIndex, int avoidX, int avoidW)
+{
+    static const int phaseCounts[] = {7, 10, 15};
+    int phaseTotal = (int)(sizeof(phaseCounts) / sizeof(phaseCounts[0]));
+    int spawnCount;
+    int i;
+
+    if (phaseIndex < 0 || phaseIndex >= phaseTotal)
+        return;
+
+    spawnCount = phaseCounts[phaseIndex];
+    if (spawnCount > MAX_NPCS)
+        spawnCount = MAX_NPCS;
+
+    for (i = 0; i < MAX_NPCS; i++)
+        removeNPCFromPlay(&npcs[i]);
+
+    for (i = 0; i < spawnCount; i++)
+        spawnNPCInWave(&npcs[i], i, spawnCount, avoidX, avoidW);
+}
+
+static void spawnSecondaryEntity(SecondaryEntity *entity)
+{
+    entity->w = GEM_W;
+    entity->h = GEM_H;
+    entity->active = 1;
+    entity->x = (float)(SHIP_END_X + 80 +
+                        rand() % (WORLD_W - SHIP_END_X - GEM_W - 160));
+    entity->y = (float)(MARS_GROUND_Y + PLAYER_H - entity->h);
+}
+
+static int initSecondaryEntities(SecondaryEntity entities[], int count)
+{
+    int i;
+    int spawnCount;
+
+    for (i = 0; i < count; i++)
+        entities[i].active = 0;
+
+    spawnCount = MIN_SECONDARY_ENTITIES +
+                 rand() % (MAX_SECONDARY_ENTITIES - MIN_SECONDARY_ENTITIES + 1);
+    if (spawnCount > count)
+        spawnCount = count;
+
+    for (i = 0; i < spawnCount; i++)
+        spawnSecondaryEntity(&entities[i]);
+
+    return spawnCount;
+}
+
+static void renderSecondaryEntities(SDL_Renderer *renderer,
+                                    SecondaryEntity entities[], int count,
+                                    SDL_Texture *gemTexture, int cameraX)
+{
+    int i;
+
+    for (i = 0; i < count; i++)
+    {
+        SDL_Rect dst;
+
+        if (!entities[i].active)
+            continue;
+
+        dst.x = (int)entities[i].x - cameraX;
+        dst.y = (int)entities[i].y;
+        dst.w = entities[i].w;
+        dst.h = entities[i].h;
+
+        if (gemTexture != NULL)
+            SDL_RenderCopy(renderer, gemTexture, NULL, &dst);
+        else
+        {
+            SDL_SetRenderDrawColor(renderer, 30, 190, 255, 255);
+            SDL_RenderFillRect(renderer, &dst);
+        }
+    }
+}
+
+
 static void afficherDebugCollision(SDL_Renderer *renderer,
                                    Joueur *J1, Joueur *J2,
                                    int cameraX,
@@ -288,10 +404,7 @@ static void afficherDebugCollision(SDL_Renderer *renderer,
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 }
 
-/**
-* @brief Main entry point of the SDL game.
-* @return 0 when the game closes normally, 1 when initialization fails
-*/
+
 int main(void)
 {
     SDL_Window *window;
@@ -301,9 +414,9 @@ int main(void)
     Joueur J2;
     Bullet bullets[MAX_BULLETS];
     NPC npcs[MAX_NPCS];
+    SecondaryEntity gems[MAX_SECONDARY_ENTITIES];
     SDL_Event event;
     const Uint8 *keys;
-    SDL_Rect ground;
     SDL_Rect shipGround;
     SDL_Rect marsGround;
     SDL_Rect stablePlatforms[STABLE_PLATFORM_COUNT];
@@ -312,6 +425,7 @@ int main(void)
     SDL_Rect camera;
     SDL_Rect bgSrc;
     SDL_Rect bgDst;
+    SDL_Rect viewports[2];
     SDL_Rect mapDst;
     SDL_Rect mapPlayer;
     SDL_Rect mapPlatform;
@@ -330,34 +444,99 @@ int main(void)
     SDL_Texture *marsGroundTex;
     SDL_Texture *shipPlatformTex;
     SDL_Texture *marsPlatformTex;
+    SDL_Texture *gemTexture;
     SDL_Texture *mapTexture;
     SDL_Surface *mapFrame;
     Minimap minimap;
     Enemy mapEnemies[MAX_ENEMIES];
     Highscore hs;
+    const CharacterDefinition *characters;
+    CharacterSelection selection;
     int running;
     int i;
     int p;
     int cameraX;
+    int npcUpdateCameraX;
+    int npcUpdateViewW;
+    int renderPass;
+    int renderPasses;
+    int sharedView;
+    int viewW;
+    int playerDistance;
     int minimapReady;
+    int gemCount;
+    int gemDamageBuffTimer;
     int movingDir[MOVING_PLATFORM_COUNT];
     int movingMin[MOVING_PLATFORM_COUNT];
     int movingMax[MOVING_PLATFORM_COUNT];
-    int enemySlots[MAX_NPCS];
+    int npcSwarmAlerted;
+    int npcPhaseIndex;
     int joueurActif;
     int puzzleChallengeUsed;
+    int multiplayerMode;
+    int selectedSaveLoaded;
+    int menuChoice;
     int quitterSansScore;
     int debugCollision;
     int finalScore;
+    int characterCount;
     char selectedSave[SAVE_PATH_MAX];
     Uint32 now;
 
     if (!initSDL(&window, &renderer))
         return 1;
 
-    font = TTF_OpenFont("assets_pluto/font.ttf", 28);
+    font = TTF_OpenFont(PLUTO_FONT_PATH, 28);
     if (font == NULL)
         printf("[ERREUR] TTF_OpenFont : %s\n", TTF_GetError());
+
+    menuChoice = run_main_menu(renderer);
+    if (menuChoice != MAIN_MENU_START)
+    {
+        if (font != NULL)
+            TTF_CloseFont(font);
+        shutdownSDL(window, renderer);
+        return 0;
+    }
+
+    selectedSaveLoaded = prompt_select_save(renderer, font, selectedSave, sizeof(selectedSave));
+    if (selectedSaveLoaded < 0)
+    {
+        if (font != NULL)
+            TTF_CloseFont(font);
+        shutdownSDL(window, renderer);
+        return 0;
+    }
+
+    multiplayerMode = 1;
+    if (!selectedSaveLoaded)
+    {
+        multiplayerMode = prompt_game_mode(renderer, font);
+        if (multiplayerMode < 0)
+        {
+            if (font != NULL)
+                TTF_CloseFont(font);
+            shutdownSDL(window, renderer);
+            return 0;
+        }
+        multiplayerMode = (multiplayerMode == GAME_MODE_MULTI);
+    }
+
+    characters = getCharacterDefinitions(&characterCount);
+    selection.p1CharacterIndex = 0;
+    selection.p1OutfitIndex = 0;
+    selection.p2CharacterIndex = (characterCount > 1) ? 1 : 0;
+    selection.p2OutfitIndex = 0;
+
+    if (!selectedSaveLoaded && multiplayerMode && characterCount > 0 && !runCharacterSelectMenu(renderer, font, &selection))
+    {
+        if (font != NULL)
+            TTF_CloseFont(font);
+        shutdownSDL(window, renderer);
+        return 0;
+    }
+
+    stellarMusicStartGameplay();
 
     background = IMG_LoadTexture(renderer, "assets/mars_ship_level_full.png");
     backgroundMid = IMG_LoadTexture(renderer, "assets/mars_ship_level_mid.png");
@@ -366,6 +545,7 @@ int main(void)
     marsGroundTex = IMG_LoadTexture(renderer, "assets/mars_ground_pixel.png");
     shipPlatformTex = IMG_LoadTexture(renderer, "assets/ship_platform_pixel.png");
     marsPlatformTex = IMG_LoadTexture(renderer, "assets/mars_platform_pixel.png");
+    gemTexture = IMG_LoadTexture(renderer, "assets/blue_gem.png");
     if (background == NULL)
     {
         printf("[ERREUR] IMG_LoadTexture : %s\n", IMG_GetError());
@@ -386,13 +566,38 @@ int main(void)
         SDL_SetTextureBlendMode(shipPlatformTex, SDL_BLENDMODE_BLEND);
     if (marsPlatformTex != NULL)
         SDL_SetTextureBlendMode(marsPlatformTex, SDL_BLENDMODE_BLEND);
+    if (gemTexture != NULL)
+        SDL_SetTextureBlendMode(gemTexture, SDL_BLENDMODE_BLEND);
 
     mapFrame = SDL_CreateRGBSurfaceWithFormat(0, SCREEN_W, SCREEN_H, 32, SDL_PIXELFORMAT_RGBA32);
     minimapReady = 0;
     if (mapFrame != NULL && init_minimap(&minimap, "minimap/minimap_pixel.bmp", SCREEN_W, SCREEN_H, WORLD_W, WORLD_H) == 0)
         minimapReady = 1;
 
-    if (!initialiserJoueur(&J1, renderer, 100, GROUND_Y))
+    if (characterCount > 0)
+    {
+        if (selection.p1CharacterIndex < 0 || selection.p1CharacterIndex >= characterCount)
+            selection.p1CharacterIndex = 0;
+        if (selection.p2CharacterIndex < 0 || selection.p2CharacterIndex >= characterCount)
+            selection.p2CharacterIndex = 0;
+        if (selection.p1OutfitIndex < 0 || selection.p1OutfitIndex > 1)
+            selection.p1OutfitIndex = 0;
+        if (selection.p2OutfitIndex < 0 || selection.p2OutfitIndex > 1)
+            selection.p2OutfitIndex = 0;
+    }
+
+    if (characterCount > 0)
+    {
+        if (!initialiserJoueurAvecAssets(&J1, renderer, 100, GROUND_Y,
+                                         &characters[selection.p1CharacterIndex].outfits[selection.p1OutfitIndex]))
+        {
+            if (font != NULL)
+                TTF_CloseFont(font);
+            shutdownSDL(window, renderer);
+            return 1;
+        }
+    }
+    else if (!initialiserJoueur(&J1, renderer, 100, GROUND_Y))
     {
         if (font != NULL)
             TTF_CloseFont(font);
@@ -400,7 +605,19 @@ int main(void)
         return 1;
     }
 
-    if (!initialiserJoueur(&J2, renderer, 1000, GROUND_Y))
+    if (characterCount > 0)
+    {
+        if (!initialiserJoueurAvecAssets(&J2, renderer, 1000, GROUND_Y,
+                                         &characters[selection.p2CharacterIndex].outfits[selection.p2OutfitIndex]))
+        {
+            libererJoueur(&J1);
+            if (font != NULL)
+                TTF_CloseFont(font);
+            shutdownSDL(window, renderer);
+            return 1;
+        }
+    }
+    else if (!initialiserJoueur(&J2, renderer, 1000, GROUND_Y))
     {
         libererJoueur(&J1);
         if (font != NULL)
@@ -409,43 +626,36 @@ int main(void)
         return 1;
     }
 
+    srand((unsigned)SDL_GetTicks());
     initBullets(bullets, MAX_BULLETS);
+    gemCount = initSecondaryEntities(gems, MAX_SECONDARY_ENTITIES);
+    gemDamageBuffTimer = 0;
     J1.visible = 1;
-    J2.visible = 0;
+    J2.visible = multiplayerMode;
     J2.facing = FACE_LEFT;
     joueurActif = 1;
 
-    srand((unsigned)SDL_GetTicks());
-    enemySlots[0] = 3180;
-    enemySlots[1] = 3450;
-    enemySlots[2] = 3720;
-    enemySlots[3] = 4020;
-    enemySlots[4] = 4300;
-    enemySlots[5] = 4620;
-    enemySlots[6] = 4920;
+    npcPhaseIndex = 0;
     for (i = 0; i < MAX_NPCS; i++)
     {
-        int enemyX = enemySlots[i] + (rand() % 61) - 30;
-        npcs[i] = (NPC){enemyX, 492, 128, 128, NULL, NULL, NULL, {0, 0, 0, 0}, {enemyX, 492, 128, 128}, 0, 0, enemyX - 90, enemyX + 90, MARS_GROUND_Y, 0, 0, 0, ENEMY_ALIVE, 0, 0, 0, 0};
-        if (npcs[i].posMin < 0)
-            npcs[i].posMin = 0;
-        if (npcs[i].posMax > WORLD_W - npcs[i].w)
-            npcs[i].posMax = WORLD_W - npcs[i].w;
+        npcs[i] = (NPC){0, MARS_GROUND_Y + PLAYER_H - 128, 128, 128, NULL, NULL, NULL, {0, 0, 0, 0}, {0, 0, 0, 0}, 0, 0, 0, 0, MARS_GROUND_Y, 0, 0, 0, ENEMY_REMOVED, 0, 0, 0, 0, 0.0f, 1, 0};
         initNPC(&npcs[i], renderer);
+        removeNPCFromPlay(&npcs[i]);
     }
+    lancerPhasePNJ(npcs, npcPhaseIndex, 0, SCREEN_W);
 
-    ground.x = 0;
-    ground.y = GROUND_Y + PLAYER_H;
-    ground.w = SCREEN_W;
-    ground.h = SCREEN_H - (GROUND_Y + PLAYER_H);
     shipGround.x = 0;
-    shipGround.y = ground.y;
+    shipGround.y = GROUND_Y + PLAYER_H;
     shipGround.w = SHIP_END_X;
-    shipGround.h = ground.h;
+    shipGround.h = SCREEN_H - shipGround.y;
+    alignerSolVisuel(&shipGround, shipGroundTex,
+                     GROUND_Y + PLAYER_H, SHIP_GROUND_SURFACE_OFFSET);
     marsGround.x = SHIP_END_X;
     marsGround.y = MARS_GROUND_Y + PLAYER_H;
     marsGround.w = WORLD_W - SHIP_END_X;
-    marsGround.h = ground.h;
+    marsGround.h = SCREEN_H - marsGround.y;
+    alignerSolVisuel(&marsGround, marsGroundTex,
+                     MARS_GROUND_Y + PLAYER_H, MARS_GROUND_SURFACE_OFFSET);
     stablePlatforms[0] = (SDL_Rect){900, 410, 360, 34};
     stablePlatforms[1] = (SDL_Rect){2150, 440, 360, 34};
     stablePlatforms[2] = (SDL_Rect){3900, 425, 360, 34};
@@ -461,6 +671,7 @@ int main(void)
     running = 1;
     quitterSansScore = 0;
     debugCollision = 0;
+    npcSwarmAlerted = 0;
     puzzleChallengeUsed = 0;
     for (i = 0; i < MAX_ENEMIES; i++)
         mapEnemies[i].active = 0;
@@ -472,8 +683,10 @@ int main(void)
     bgDst.y = 0;
     bgDst.w = SCREEN_W;
     bgDst.h = SCREEN_H;
+    viewports[0] = (SDL_Rect){0, 0, SCREEN_W / 2, SCREEN_H};
+    viewports[1] = (SDL_Rect){SCREEN_W / 2, 0, SCREEN_W / 2, SCREEN_H};
 
-    if (prompt_select_save(renderer, font, selectedSave, sizeof(selectedSave)))
+    if (selectedSaveLoaded)
     {
         if (!load_game_state(selectedSave,
                              &J1, &J2,
@@ -482,21 +695,59 @@ int main(void)
                              stablePlatforms, STABLE_PLATFORM_COUNT,
                              movingPlatforms, MOVING_PLATFORM_COUNT,
                              movingDir, movingMin, movingMax,
-                             &joueurActif, &puzzleChallengeUsed))
+                             &joueurActif, &puzzleChallengeUsed,
+                             &multiplayerMode))
             show_save_message(renderer, font, "Could not load saved game");
     }
 
     while (running)
     {
-        if (joueurActif == 1)
-            cameraX = J1.posScreen.x + J1.posScreen.w / 2 - SCREEN_W / 2;
+        stellarMusicUpdateGameplay();
+        J1.visible = 1;
+        J2.visible = multiplayerMode;
+        if (multiplayerMode)
+        {
+            playerDistance = J1.posScreen.x + J1.posScreen.w / 2 -
+                             (J2.posScreen.x + J2.posScreen.w / 2);
+            if (playerDistance < 0)
+                playerDistance = -playerDistance;
+            sharedView = playerDistance <= SCREEN_W - PLAYER_W;
+        }
         else
-            cameraX = J2.posScreen.x + J2.posScreen.w / 2 - SCREEN_W / 2;
+            sharedView = 1;
+        renderPasses = sharedView ? 1 : 2;
+
+        SDL_RenderSetViewport(renderer, NULL);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        for (renderPass = 0; renderPass < renderPasses; renderPass++)
+        {
+        if (sharedView)
+        {
+            int j1Center = J1.posScreen.x + J1.posScreen.w / 2;
+            int j2Center = J2.posScreen.x + J2.posScreen.w / 2;
+
+            viewW = SCREEN_W;
+            if (multiplayerMode)
+                cameraX = (j1Center + j2Center) / 2 - viewW / 2;
+            else
+                cameraX = j1Center - viewW / 2;
+            SDL_RenderSetViewport(renderer, NULL);
+        }
+        else
+        {
+            Joueur *focus = (renderPass == 0) ? &J1 : &J2;
+
+            viewW = SCREEN_W / 2;
+            cameraX = focus->posScreen.x + focus->posScreen.w / 2 - viewW / 2;
+            SDL_RenderSetViewport(renderer, &viewports[renderPass]);
+        }
 
         if (cameraX < 0)
             cameraX = 0;
-        if (cameraX > WORLD_W - SCREEN_W)
-            cameraX = WORLD_W - SCREEN_W;
+        if (cameraX > WORLD_W - viewW)
+            cameraX = WORLD_W - viewW;
 
         camera.x = cameraX;
         bgSrc.x = camera.x;
@@ -512,8 +763,6 @@ int main(void)
         foreSrc.w = SCREEN_W;
         foreSrc.h = SCREEN_H;
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, background, &bgSrc, &bgDst);
         if (backgroundMid != NULL)
             SDL_RenderCopy(renderer, backgroundMid, &midSrc, &bgDst);
@@ -569,12 +818,15 @@ int main(void)
             }
         }
 
+        renderSecondaryEntities(renderer, gems, gemCount, gemTexture, camera.x);
+
         savedJ1 = J1.posScreen;
         savedJ2 = J2.posScreen;
         J1.posScreen.x -= camera.x;
         J2.posScreen.x -= camera.x;
         renderJoueur(renderer, &J1);
-        renderJoueur(renderer, &J2);
+        if (multiplayerMode)
+            renderJoueur(renderer, &J2);
 
         for (i = 0; i < MAX_BULLETS; i++)
         {
@@ -649,7 +901,7 @@ int main(void)
         if (minimapReady)
         {
             SDL_FillRect(mapFrame, NULL, SDL_MapRGBA(mapFrame->format, 0, 0, 0, 0));
-            if (joueurActif == 1)
+            if (!multiplayerMode || joueurActif == 1)
                 mapPlayer = J1.posScreen;
             else
                 mapPlayer = J2.posScreen;
@@ -694,7 +946,17 @@ int main(void)
             afficherDebugCollision(renderer, &J1, &J2, camera.x,
                                    shipGround, marsGround,
                                    stablePlatforms, movingPlatforms);
-        afficherHUD(renderer, font, &J1, &J2, joueurActif);
+        afficherHUD(renderer, font, &J1, &J2,
+                    multiplayerMode ? (sharedView ? joueurActif : renderPass + 1) : 1);
+        }
+        SDL_RenderSetViewport(renderer, NULL);
+        if (!sharedView)
+        {
+            SDL_Rect divider = {SCREEN_W / 2 - 2, 0, 4, SCREEN_H};
+
+            SDL_SetRenderDrawColor(renderer, 220, 220, 220, 255);
+            SDL_RenderFillRect(renderer, &divider);
+        }
         SDL_RenderPresent(renderer);
 
         now = SDL_GetTicks();
@@ -712,6 +974,7 @@ int main(void)
                                                 stablePlatforms, movingPlatforms,
                                                 movingDir, movingMin, movingMax,
                                                 joueurActif, puzzleChallengeUsed,
+                                                multiplayerMode,
                                                 renderer, font))
                         running = 0;
                     else
@@ -736,6 +999,7 @@ int main(void)
                                                    stablePlatforms, movingPlatforms,
                                                    movingDir, movingMin, movingMax,
                                                    joueurActif, puzzleChallengeUsed,
+                                                   multiplayerMode,
                                                    renderer, font))
                             running = 0;
                         else
@@ -754,6 +1018,7 @@ int main(void)
                                                stablePlatforms, movingPlatforms,
                                                movingDir, movingMin, movingMax,
                                                joueurActif, puzzleChallengeUsed,
+                                               multiplayerMode,
                                                renderer, font))
                         show_save_message(renderer, font, "Game saved");
                     else
@@ -763,32 +1028,27 @@ int main(void)
                 if (event.key.keysym.scancode == SDL_SCANCODE_F3)
                     debugCollision = !debugCollision;
 
-                if (event.key.keysym.scancode == SDL_SCANCODE_M)
+                if (event.key.keysym.scancode == SDL_SCANCODE_M && multiplayerMode)
                 {
-                    if (joueurActif == 1)
-                    {
-                        joueurActif = 2;
-                        J1.visible = 0;
-                        J2.visible = 1;
-                        reinitialiserPositionJoueur(&J2);
-                    }
-                    else
-                    {
-                        joueurActif = 1;
-                        J1.visible = 1;
-                        J2.visible = 0;
-                        reinitialiserPositionJoueur(&J1);
-                    }
-                    effacerBullets(bullets, MAX_BULLETS);
+                    joueurActif = (joueurActif == 1) ? 2 : 1;
                 }
 
                 if (event.key.keysym.scancode == SDL_SCANCODE_E)
+                    tirerBullet(bullets, MAX_BULLETS, &J1, 1, now);
+
+                if (multiplayerMode &&
+                    (event.key.keysym.scancode == SDL_SCANCODE_RCTRL ||
+                     event.key.keysym.scancode == SDL_SCANCODE_RETURN))
                 {
-                    if (joueurActif == 1)
-                        tirerBullet(bullets, MAX_BULLETS, &J1, 1, now);
-                    else
-                        tirerBullet(bullets, MAX_BULLETS, &J2, 2, now);
+                    tirerBullet(bullets, MAX_BULLETS, &J2, 2, now);
                 }
+            }
+
+            if (event.type == SDL_MOUSEBUTTONDOWN &&
+                event.button.button == SDL_BUTTON_LEFT &&
+                multiplayerMode)
+            {
+                tirerBullet(bullets, MAX_BULLETS, &J2, 2, now);
             }
         }
 
@@ -809,17 +1069,21 @@ int main(void)
             J1.floorY = MARS_GROUND_Y;
         else
             J1.floorY = GROUND_Y;
-        if (J2.posScreen.x >= SHIP_END_X)
-            J2.floorY = MARS_GROUND_Y;
-        else
-            J2.floorY = GROUND_Y;
+        if (multiplayerMode)
+        {
+            if (J2.posScreen.x >= SHIP_END_X)
+                J2.floorY = MARS_GROUND_Y;
+            else
+                J2.floorY = GROUND_Y;
+        }
         for (p = 0; p < STABLE_PLATFORM_COUNT; p++)
         {
             if (J1.posScreen.x + J1.posScreen.w > stablePlatforms[p].x &&
                 J1.posScreen.x < stablePlatforms[p].x + stablePlatforms[p].w &&
                 J1.posScreen.y + J1.posScreen.h <= stablePlatforms[p].y + 12)
                 J1.floorY = stablePlatforms[p].y - PLAYER_H;
-            if (J2.posScreen.x + J2.posScreen.w > stablePlatforms[p].x &&
+            if (multiplayerMode &&
+                J2.posScreen.x + J2.posScreen.w > stablePlatforms[p].x &&
                 J2.posScreen.x < stablePlatforms[p].x + stablePlatforms[p].w &&
                 J2.posScreen.y + J2.posScreen.h <= stablePlatforms[p].y + 12)
                 J2.floorY = stablePlatforms[p].y - PLAYER_H;
@@ -830,28 +1094,23 @@ int main(void)
                 J1.posScreen.x < movingPlatforms[p].x + movingPlatforms[p].w &&
                 J1.posScreen.y + J1.posScreen.h <= movingPlatforms[p].y + 12)
                 J1.floorY = movingPlatforms[p].y - PLAYER_H;
-            if (J2.posScreen.x + J2.posScreen.w > movingPlatforms[p].x &&
+            if (multiplayerMode &&
+                J2.posScreen.x + J2.posScreen.w > movingPlatforms[p].x &&
                 J2.posScreen.x < movingPlatforms[p].x + movingPlatforms[p].w &&
                 J2.posScreen.y + J2.posScreen.h <= movingPlatforms[p].y + 12)
                 J2.floorY = movingPlatforms[p].y - PLAYER_H;
         }
 
-        if (joueurActif == 1)
-        {
-            previousPlayer = J1.posScreen;
-            gererEntreeJoueurClavier(&J1, keys, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP);
-            J2.moveLeft = 0;
-            J2.moveRight = 0;
-            updateJoueur(&J1, now);
-            appliquerCollisionDessousPlateformes(&J1, previousPlayer,
-                                                 stablePlatforms, movingPlatforms);
-        }
-        else
+        previousPlayer = J1.posScreen;
+        gererEntreeJoueurClavier(&J1, keys, SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W);
+        updateJoueur(&J1, now);
+        appliquerCollisionDessousPlateformes(&J1, previousPlayer,
+                                             stablePlatforms, movingPlatforms);
+
+        if (multiplayerMode)
         {
             previousPlayer = J2.posScreen;
-            gererEntreeJoueurClavier(&J2, keys, SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_W);
-            J1.moveLeft = 0;
-            J1.moveRight = 0;
+            gererEntreeJoueurClavier(&J2, keys, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP);
             updateJoueur(&J2, now);
             appliquerCollisionDessousPlateformes(&J2, previousPlayer,
                                                  stablePlatforms, movingPlatforms);
@@ -860,10 +1119,36 @@ int main(void)
         if (running)
         {
             Joueur *joueurCourant;
-            if (joueurActif == 1)
+            if (!multiplayerMode || joueurActif == 1)
                 joueurCourant = &J1;
             else
                 joueurCourant = &J2;
+
+            if (gemDamageBuffTimer > 0)
+                gemDamageBuffTimer--;
+
+            if (joueurCourant->alive && joueurCourant->visible)
+            {
+                for (i = 0; i < gemCount; i++)
+                {
+                    SDL_Rect gemRect;
+
+                    if (!gems[i].active)
+                        continue;
+
+                    gemRect.x = (int)gems[i].x;
+                    gemRect.y = (int)gems[i].y;
+                    gemRect.w = gems[i].w;
+                    gemRect.h = gems[i].h;
+
+                    if (collisionAABB(joueurCourant->posScreen, gemRect))
+                    {
+                        ajouterScoreJoueur(joueurCourant, GEM_SCORE_VALUE);
+                        gemDamageBuffTimer = GEM_BUFF_DURATION;
+                        gems[i].active = 0;
+                    }
+                }
+            }
 
             if (!joueurCourant->alive &&
                 joueurCourant->vies <= 0 &&
@@ -882,16 +1167,100 @@ int main(void)
 
         updateBullets(bullets, MAX_BULLETS);
 
+        if (phasePNJTerminee(npcs) && npcPhaseIndex < 2)
+        {
+            Joueur *joueurCourant;
+            int phaseAvoidX;
+            int phaseAvoidW;
+
+            npcPhaseIndex++;
+            npcSwarmAlerted = 0;
+
+            if (!multiplayerMode || joueurActif == 1)
+                joueurCourant = &J1;
+            else
+                joueurCourant = &J2;
+
+            if (sharedView)
+            {
+                int j1Center = J1.posScreen.x + J1.posScreen.w / 2;
+                int j2Center = J2.posScreen.x + J2.posScreen.w / 2;
+
+                phaseAvoidW = SCREEN_W;
+                if (multiplayerMode)
+                    phaseAvoidX = (j1Center + j2Center) / 2 - phaseAvoidW / 2;
+                else
+                    phaseAvoidX = joueurCourant->posScreen.x + joueurCourant->posScreen.w / 2 - phaseAvoidW / 2;
+            }
+            else
+            {
+                phaseAvoidW = SCREEN_W / 2;
+                phaseAvoidX = joueurCourant->posScreen.x + joueurCourant->posScreen.w / 2 - phaseAvoidW / 2;
+            }
+
+            if (phaseAvoidX < 0)
+                phaseAvoidX = 0;
+            if (phaseAvoidX > WORLD_W - phaseAvoidW)
+                phaseAvoidX = WORLD_W - phaseAvoidW;
+
+            lancerPhasePNJ(npcs, npcPhaseIndex, phaseAvoidX, phaseAvoidW);
+        }
+
+        if (!npcSwarmAlerted)
+        {
+            Joueur *joueurCourant;
+
+            if (!multiplayerMode || joueurActif == 1)
+                joueurCourant = &J1;
+            else
+                joueurCourant = &J2;
+
+            for (i = 0; i < MAX_NPCS; i++)
+            {
+                if (npcCanSeePlayer(&npcs[i], joueurCourant))
+                {
+                    npcSwarmAlerted = 1;
+                    break;
+                }
+            }
+        }
+
         for (i = 0; i < MAX_NPCS; i++)
         {
             int j;
             Joueur *joueurCourant;
-            updateNPC(&npcs[i]);
 
-            if (joueurActif == 1)
+            if (!multiplayerMode || joueurActif == 1)
                 joueurCourant = &J1;
             else
                 joueurCourant = &J2;
+
+            if (sharedView)
+            {
+                int j1Center = J1.posScreen.x + J1.posScreen.w / 2;
+                int j2Center = J2.posScreen.x + J2.posScreen.w / 2;
+
+                npcUpdateViewW = SCREEN_W;
+                if (multiplayerMode)
+                    npcUpdateCameraX = (j1Center + j2Center) / 2 - npcUpdateViewW / 2;
+                else
+                    npcUpdateCameraX = joueurCourant->posScreen.x + joueurCourant->posScreen.w / 2 - npcUpdateViewW / 2;
+            }
+            else
+            {
+                npcUpdateViewW = SCREEN_W / 2;
+                npcUpdateCameraX = joueurCourant->posScreen.x + joueurCourant->posScreen.w / 2 - npcUpdateViewW / 2;
+            }
+
+            if (npcUpdateCameraX < 0)
+                npcUpdateCameraX = 0;
+            if (npcUpdateCameraX > WORLD_W - npcUpdateViewW)
+                npcUpdateCameraX = WORLD_W - npcUpdateViewW;
+
+            updateNPC(&npcs[i], joueurCourant, npcSwarmAlerted,
+                      npcUpdateCameraX, npcUpdateViewW,
+                      stablePlatforms, STABLE_PLATFORM_COUNT,
+                      movingPlatforms, MOVING_PLATFORM_COUNT);
 
             if (isNPCActive(&npcs[i]) &&
                 joueurCourant->alive &&
@@ -928,8 +1297,10 @@ int main(void)
                 if (isNPCActive(&npcs[i]) &&
                     collisionAABB(bullets[j].rect, npcs[i].dstRect))
                 {
+                    int hitDamage = gemDamageBuffTimer > 0 ? GEM_DAMAGE_BONUS : 1;
+
                     bullets[j].active = 0;
-                    npcs[i].health--;
+                    npcs[i].health -= hitDamage;
                     if (bullets[j].owner == 1)
                         ajouterScoreJoueur(&J1, ENEMY_HIT_SCORE);
                     else if (bullets[j].owner == 2)
@@ -950,11 +1321,15 @@ int main(void)
                 }
             }
         }
+
+        separerPNJEntasses(npcs);
     }
 
     if (!quitterSansScore)
     {
-        finalScore = J1.score + J2.score;
+        finalScore = J1.score;
+        if (multiplayerMode)
+            finalScore += J2.score;
         init_highscore(&hs, renderer, finalScore);
         running = 1;
         while (running)
@@ -988,6 +1363,7 @@ int main(void)
     SDL_DestroyTexture(marsGroundTex);
     SDL_DestroyTexture(shipPlatformTex);
     SDL_DestroyTexture(marsPlatformTex);
+    SDL_DestroyTexture(gemTexture);
 
     for (i = 0; i < MAX_NPCS; i++)
         destroyNPC(&npcs[i]);

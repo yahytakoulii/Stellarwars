@@ -1,6 +1,25 @@
 var searchData=
 [
-  ['update_5fplatforms_98',['update_platforms',['../background_8c.html#a48ed93f61b5462be5e76666802217807',1,'update_platforms(Background *bg):&#160;background.c'],['../background_8h.html#a48ed93f61b5462be5e76666802217807',1,'update_platforms(Background *bg):&#160;background.c']]],
-  ['update_5ftimer_99',['update_timer',['../background_8c.html#aad8db83b0e69129a30d2c179cfe5d343',1,'update_timer(GameTimer *t):&#160;background.c'],['../background_8h.html#aad8db83b0e69129a30d2c179cfe5d343',1,'update_timer(GameTimer *t):&#160;background.c']]],
-  ['usesprite_100',['useSprite',['../structNPC.html#a167ee674f17cea1f06f4b1f35b418e60',1,'NPC']]]
+  ['target_5frect_0',['target_rect',['../structGameContext.html#a18713c77b9db5ec6c730bb43bf39151a',1,'GameContext']]],
+  ['tex_5fbg_1',['tex_bg',['../structGameContext.html#a7cbde413c754d50c149eea434e8705db',1,'GameContext']]],
+  ['tex_5ffeedback_2',['tex_feedback',['../structGameContext.html#a6bb92e3420609aa8718956f640e26743',1,'GameContext']]],
+  ['tex_5fpuzzle_3',['tex_puzzle',['../structGameContext.html#a89cb08f4c0ab567287d2ee6628258a99',1,'GameContext']]],
+  ['textcolor_4',['textColor',['../structHighscore.html#a8c8721af713cc498f46d049d701eb740',1,'Highscore']]],
+  ['texture_5',['texture',['../structButton.html#ad6f7f30cae41e6be0be0828df5ab6e36',1,'Button::texture'],['../structAnimation.html#a9f2dc152bad0860f26fb485082383b78',1,'Animation::texture'],['../structMainMenuImage.html#a26918d7d05983eb3f2141f9abb4f80b0',1,'MainMenuImage::texture'],['../structPiece.html#ac63281fa173dc698d82d18f106509b00',1,'Piece::texture']]],
+  ['texture_5fhover_6',['texture_hover',['../structButton.html#aebc6c81ab27320dfc35a02dbf08b71f5',1,'Button']]],
+  ['thumbnail_7',['thumbnail',['../structMinimap.html#af53953f3462f0e5ecb37e767fb260db5',1,'Minimap']]],
+  ['timer_5fbar_5fh_8',['TIMER_BAR_H',['../assets_8h.html#a0e5a2328af6c7214a8ea510e1f1f9b20',1,'assets.h']]],
+  ['timer_5fbar_5fw_9',['TIMER_BAR_W',['../assets_8h.html#a22a3eac2845f10ac7ac221642db156aa',1,'assets.h']]],
+  ['timer_5fbar_5fx_10',['TIMER_BAR_X',['../assets_8h.html#aa209f127a5adac99531dca04fce174f9',1,'assets.h']]],
+  ['timer_5fbar_5fy_11',['TIMER_BAR_Y',['../assets_8h.html#a01a81381072d1e6d260b5f0794d1ed2a',1,'assets.h']]],
+  ['timer_5ffraction_12',['timer_fraction',['../structGameContext.html#a87afb79578557aa792f812b7436fe3d9',1,'GameContext']]],
+  ['timer_5fseconds_13',['TIMER_SECONDS',['../assets_8h.html#a68b55d57b0b8ce2cab2734feacb8511d',1,'assets.h']]],
+  ['tirerbullet_14',['tirerbullet',['../header_8h.html#ad8e88bbd7ee79fbe226df53820152828',1,'tirerBullet(Bullet bullets[], int size, Joueur *shooter, int owner, Uint32 now):&#160;joueur.c'],['../joueur_8c.html#ad8e88bbd7ee79fbe226df53820152828',1,'tirerBullet(Bullet bullets[], int size, Joueur *shooter, int owner, Uint32 now):&#160;joueur.c']]],
+  ['toggle_5fguide_15',['toggle_guide',['../background_8c.html#ad530535dd25d73d8f9fb69059d00bb75',1,'toggle_guide(Guide *g):&#160;background.c'],['../background_8h.html#ad530535dd25d73d8f9fb69059d00bb75',1,'toggle_guide(Guide *g):&#160;background.c']]],
+  ['tray_5fgap_16',['TRAY_GAP',['../assets_8h.html#aced37d2c4bebff3f7c92b4bd15a67a31',1,'assets.h']]],
+  ['tray_5fpiece_5fh_17',['TRAY_PIECE_H',['../assets_8h.html#a5deefc326233f98c751e52b9c5b819ad',1,'assets.h']]],
+  ['tray_5fpiece_5fw_18',['TRAY_PIECE_W',['../assets_8h.html#adcafc3943f74cf586c100dbc4a2ce75c',1,'assets.h']]],
+  ['tray_5frect_19',['tray_rect',['../structPiece.html#ac4799a542c8836564cc7d1da663f6545',1,'Piece']]],
+  ['tray_5fy_20',['TRAY_Y',['../assets_8h.html#a994018df0f2ed3e16fcdc4452580ce81',1,'assets.h']]],
+  ['type_21',['type',['../structPlatform.html#a2e31afa2ebc0537e764dc5d8bdc1ae4a',1,'Platform']]]
 ];

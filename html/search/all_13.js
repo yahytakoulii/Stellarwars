@@ -1,6 +1,11 @@
 var searchData=
 [
-  ['vely_101',['velY',['../structJoueur.html#afe00993ca45563648384bb7035eb7c8a',1,'Joueur']]],
-  ['vies_102',['vies',['../structJoueur.html#a6c94f4a1d27fca02335fc1b74c4d0173',1,'Joueur']]],
-  ['visible_103',['visible',['../structGuide.html#ac0e1725f83ca5e2775cd27ec2f9d6802',1,'Guide::visible()'],['../structJoueur.html#aee5412cabfaef4e866d580a5fac8e5e5',1,'Joueur::visible()']]]
+  ['uiassets_0',['UiAssets',['../structUiAssets.html',1,'']]],
+  ['update_5fminimap_1',['update_minimap',['../minimap_8c.html#a429aca8eb67968c9fb2f223c15f76d2f',1,'update_minimap(Minimap *m, SDL_Rect playerPos, SDL_Rect cam):&#160;minimap.c'],['../minimap_8h.html#a429aca8eb67968c9fb2f223c15f76d2f',1,'update_minimap(Minimap *m, SDL_Rect playerPos, SDL_Rect cam):&#160;minimap.c']]],
+  ['update_5fplatforms_2',['update_platforms',['../background_8c.html#a48ed93f61b5462be5e76666802217807',1,'update_platforms(Background *bg):&#160;background.c'],['../background_8h.html#a48ed93f61b5462be5e76666802217807',1,'update_platforms(Background *bg):&#160;background.c']]],
+  ['update_5ftimer_3',['update_timer',['../background_8c.html#aad8db83b0e69129a30d2c179cfe5d343',1,'update_timer(GameTimer *t):&#160;background.c'],['../background_8h.html#aad8db83b0e69129a30d2c179cfe5d343',1,'update_timer(GameTimer *t):&#160;background.c']]],
+  ['updatebullets_4',['updatebullets',['../header_8h.html#a02ace028e47656f889ef48a8e0a72513',1,'updateBullets(Bullet bullets[], int size):&#160;joueur.c'],['../joueur_8c.html#a02ace028e47656f889ef48a8e0a72513',1,'updateBullets(Bullet bullets[], int size):&#160;joueur.c']]],
+  ['updatejoueur_5',['updatejoueur',['../header_8h.html#a1ccdb9b280fab5cd4ad9aaa764d068c1',1,'updateJoueur(Joueur *J, Uint32 now):&#160;joueur.c'],['../joueur_8c.html#a1ccdb9b280fab5cd4ad9aaa764d068c1',1,'updateJoueur(Joueur *J, Uint32 now):&#160;joueur.c']]],
+  ['updatenpc_6',['updatenpc',['../header_8h.html#a4f60dcde25f40a14c1ffcb33b7ad0e8e',1,'updateNPC(NPC *npc, Joueur *player, int swarmAlerted, SDL_Rect stablePlatforms[], int stableCount, SDL_Rect movingPlatforms[], int movingCount):&#160;source.c'],['../source_8c.html#a4f60dcde25f40a14c1ffcb33b7ad0e8e',1,'updateNPC(NPC *npc, Joueur *player, int swarmAlerted, SDL_Rect stablePlatforms[], int stableCount, SDL_Rect movingPlatforms[], int movingCount):&#160;source.c']]],
+  ['usesprite_7',['usesprite',['../structNPC.html#a167ee674f17cea1f06f4b1f35b418e60',1,'NPC::useSprite'],['../structSavedNPC.html#a48f0ad32276df9d2e4f60e558e9c3517',1,'SavedNPC::useSprite']]]
 ];

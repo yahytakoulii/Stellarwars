@@ -1,4 +1,20 @@
 var searchData=
 [
-  ['usesprite_209',['useSprite',['../structNPC.html#a167ee674f17cea1f06f4b1f35b418e60',1,'NPC']]]
+  ['scalex_0',['scaleX',['../structMinimap.html#acee57a7682475b144c6c639a06f74270',1,'Minimap']]],
+  ['scaley_1',['scaleY',['../structMinimap.html#aa3b19c5889345f24626547d4f186fae7',1,'Minimap']]],
+  ['score_2',['score',['../structJoueur.html#a680896b9ff71c2762ae653ef6aa7c8ce',1,'Joueur::score'],['../structSavedPlayer.html#a6d26943175016d3a4c7fa05e006679aa',1,'SavedPlayer::score']]],
+  ['scores_3',['scores',['../structHighscore.html#a06a3fab24fa77ffc38c22a36053b5cf9',1,'Highscore']]],
+  ['screenmode_4',['screenMode',['../structBackground.html#a3c6df28780392d62f0dc7908c1610c75',1,'Background']]],
+  ['slashtexture_5',['slashTexture',['../structNPC.html#a2896a28044c9b059535eb6a835fd822e',1,'NPC']]],
+  ['speed_6',['speed',['../structEnemy.html#a6091c94dbb2017ae60c8e513e6a66be1',1,'Enemy']]],
+  ['sprite_7',['sprite',['../structPlayer.html#a592d9503ea44e13660f8642b29cca4db',1,'Player::sprite'],['../structEnemy.html#a4a216db27d07f231cc82243345281732',1,'Enemy::sprite']]],
+  ['srcrect_8',['srcrect',['../structNPC.html#a3e76c0dce7bdde02666be1515d585663',1,'NPC::srcRect'],['../structSavedNPC.html#a973e295769844c85b7836acb57876bf5',1,'SavedNPC::srcRect']]],
+  ['stablecount_9',['stableCount',['../structSaveData.html#a5116ca2974d756399d6755ce0e79a247',1,'SaveData']]],
+  ['stableplatforms_10',['stablePlatforms',['../structSaveData.html#a0b4d61b45634d42c751b019daea9cb14',1,'SaveData']]],
+  ['star_11',['star',['../structHighscore.html#a7dcfaa1b0cdd9b8cfde51b28fdcd64f0',1,'Highscore']]],
+  ['start_5fticks_12',['start_ticks',['../structGameContext.html#aabaeef310ffd20848b99a73229af7b40',1,'GameContext']]],
+  ['starttime_13',['startTime',['../structGameTimer.html#a1f7b3ba3abbc9e70ee1d8a645349df2f',1,'GameTimer']]],
+  ['startx_14',['startx',['../structJoueur.html#a6c3a9e4d98ae3ec12b13a8f4699c67a7',1,'Joueur::startX'],['../structSavedPlayer.html#ad452817f59b63211a17e2217a2adc365',1,'SavedPlayer::startX']]],
+  ['starty_15',['starty',['../structJoueur.html#a2e8be1fd34de5a23a62959051b1605d4',1,'Joueur::startY'],['../structSavedPlayer.html#a04f964c76504a8be023e2be077b7a511',1,'SavedPlayer::startY']]],
+  ['state_16',['state',['../structJoueur.html#a65d1a496a8fc1cd392e8bfe727e88cd2',1,'Joueur::state'],['../structNPC.html#a48279f6cc8fe46006a802f2b15d0881f',1,'NPC::state'],['../structGameContext.html#aed5b5ec50b9c84ade70f0707679d23cf',1,'GameContext::state'],['../structSavedPlayer.html#a492dbe76c68647936b220133e088a4ed',1,'SavedPlayer::state'],['../structSavedNPC.html#a690ddc71eaa6860ca9741225971ffec0',1,'SavedNPC::state']]]
 ];

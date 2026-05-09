@@ -1,4 +1,26 @@
 var searchData=
 [
-  ['elapsed_21',['elapsed',['../structGameTimer.html#addfef2e23e860fe3a89a3ffb24c4304d',1,'GameTimer']]]
+  ['effacerbullets_0',['effacerbullets',['../header_8h.html#a2e5127a462d8c438f79f62f94f7f63e4',1,'effacerBullets(Bullet bullets[], int size):&#160;joueur.c'],['../joueur_8c.html#a2e5127a462d8c438f79f62f94f7f63e4',1,'effacerBullets(Bullet bullets[], int size):&#160;joueur.c']]],
+  ['elapsed_1',['elapsed',['../structGameTimer.html#addfef2e23e860fe3a89a3ffb24c4304d',1,'GameTimer']]],
+  ['enemy_2',['Enemy',['../structEnemy.html',1,'']]],
+  ['enemy_5falive_3',['ENEMY_ALIVE',['../header_8h.html#afa7c83b36b8a04d477dd0b7ce04e07caa6820971a164b3d0360bd985f321fff07',1,'header.h']]],
+  ['enemy_5fattack_5fcooldown_4',['ENEMY_ATTACK_COOLDOWN',['../header_8h.html#a8f4d88817812a6b83252a3bb3695a175',1,'header.h']]],
+  ['enemy_5fattack_5fduration_5',['ENEMY_ATTACK_DURATION',['../header_8h.html#ad1d07bc51fe68f066c3d0ab7d979005d',1,'header.h']]],
+  ['enemy_5fattack_5frange_6',['ENEMY_ATTACK_RANGE',['../header_8h.html#a7241fed76552098537e834af93a6834a',1,'header.h']]],
+  ['enemy_5fattacking_7',['ENEMY_ATTACKING',['../header_8h.html#afa7c83b36b8a04d477dd0b7ce04e07caa8b25c29d3b59e7f964c73abb88e96941',1,'header.h']]],
+  ['enemy_5fchase_5fspeed_8',['ENEMY_CHASE_SPEED',['../header_8h.html#a24f858290c2a8d5d3f8dc1e2e2d51814',1,'header.h']]],
+  ['enemy_5fdamage_5fscore_9',['ENEMY_DAMAGE_SCORE',['../header_8h.html#ae15eec599149007e876c24de9251bfab',1,'header.h']]],
+  ['enemy_5fdetection_5frange_10',['ENEMY_DETECTION_RANGE',['../header_8h.html#abdb47a5baa2c968bb381a72c0beca31e',1,'header.h']]],
+  ['enemy_5fgravity_11',['ENEMY_GRAVITY',['../header_8h.html#aba3820520ffd3e9dc58439d089189a6b',1,'header.h']]],
+  ['enemy_5fhealth_5fmax_12',['ENEMY_HEALTH_MAX',['../header_8h.html#a50f7ccb634a9027d640c055eece5790f',1,'header.h']]],
+  ['enemy_5fhit_5fscore_13',['ENEMY_HIT_SCORE',['../header_8h.html#ae71435499bef224bd2af1ab697c5287b',1,'header.h']]],
+  ['enemy_5finjured_14',['ENEMY_INJURED',['../header_8h.html#afa7c83b36b8a04d477dd0b7ce04e07caa707f6410193b11dbf39536211f529a67',1,'header.h']]],
+  ['enemy_5fjump_5fcooldown_15',['ENEMY_JUMP_COOLDOWN',['../header_8h.html#a6cd819110b3016d964c2f7e4eb516a89',1,'header.h']]],
+  ['enemy_5fjump_5fforce_16',['ENEMY_JUMP_FORCE',['../header_8h.html#ad5faf75483749d7b70de7bfa762f46ab',1,'header.h']]],
+  ['enemy_5fkill_5fscore_17',['ENEMY_KILL_SCORE',['../header_8h.html#acc4cfa23affcf335979e18f702926b2f',1,'header.h']]],
+  ['enemy_5fneutralized_18',['ENEMY_NEUTRALIZED',['../header_8h.html#afa7c83b36b8a04d477dd0b7ce04e07caa7c7399cf752a6351174c94c6765c1576',1,'header.h']]],
+  ['enemy_5fpatrol_5fspeed_19',['ENEMY_PATROL_SPEED',['../header_8h.html#a3a658f8f0370d15cab3ff16f88e23b68',1,'header.h']]],
+  ['enemy_5frandom_5fjump_5fchance_20',['ENEMY_RANDOM_JUMP_CHANCE',['../header_8h.html#a28307644da4a20a7ded318de26ea53d4',1,'header.h']]],
+  ['enemy_5fremoved_21',['ENEMY_REMOVED',['../header_8h.html#afa7c83b36b8a04d477dd0b7ce04e07caa90c2f7369e96664f2bf9cb2a44af5b39',1,'header.h']]],
+  ['enemystate_22',['EnemyState',['../header_8h.html#afa7c83b36b8a04d477dd0b7ce04e07ca',1,'header.h']]]
 ];

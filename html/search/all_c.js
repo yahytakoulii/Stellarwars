@@ -1,5 +1,26 @@
 var searchData=
 [
-  ['nextattackat_63',['nextAttackAt',['../structNPC.html#aa68b39b679ed7d29715aaefcf0985555',1,'NPC']]],
-  ['npc_64',['NPC',['../structNPC.html',1,'']]]
+  ['name_0',['name',['../structCharacterDefinition.html#ab8001ab52c4d68a341f586ddbcac4f39',1,'CharacterDefinition::name'],['../structSaveEntry.html#ac33e832a933e2ba1767ab640fcd0d728',1,'SaveEntry::name']]],
+  ['names_1',['names',['../structHighscore.html#ab003950de3a76353e12e15d3059dbd48',1,'Highscore']]],
+  ['newgame_2',['newgame',['../structMenuButtons.html#afb69839ee7fc048ee96c1b7b550b0cac',1,'MenuButtons::newGame'],['../structSaveMenuVisuals.html#a6038cfb600a9963b488a86f5e6aff417',1,'SaveMenuVisuals::newGame']]],
+  ['newhovered_3',['newHovered',['../structMenuButtons.html#aabe19175bf9246f316c35c471c58e397',1,'MenuButtons']]],
+  ['nextattackat_4',['nextAttackAt',['../structNPC.html#aa68b39b679ed7d29715aaefcf0985555',1,'NPC']]],
+  ['nextjumpat_5',['nextJumpAt',['../structNPC.html#aba7baaf495e65c23ce930229c2be0bf2',1,'NPC']]],
+  ['no_6',['no',['../structMenuButtons.html#a650054647bd9587918b43a89b60a8dbf',1,'MenuButtons::no'],['../structSaveMenuVisuals.html#abc34f5e0ca10ddf6f81b031eff202871',1,'SaveMenuVisuals::no']]],
+  ['nohovered_7',['noHovered',['../structMenuButtons.html#a31c63e167e38ccef806e69c255adbbfb',1,'MenuButtons']]],
+  ['normal_8',['normal',['../structMainMenuButton.html#af207afdfd54444ce3e4600bfe360e654',1,'MainMenuButton']]],
+  ['npc_9',['NPC',['../structNPC.html',1,'']]],
+  ['npc_5fdie_5fcols_10',['NPC_DIE_COLS',['../header_8h.html#a957599f1797ebec0a6e4ee4b15ea6519',1,'header.h']]],
+  ['npc_5fdie_5frows_11',['NPC_DIE_ROWS',['../header_8h.html#a640c6c6db63cf7574c9eea7c039447e0',1,'header.h']]],
+  ['npc_5fslash_5fcols_12',['NPC_SLASH_COLS',['../header_8h.html#a9ba0e39f6861587c0745e9a6272e180a',1,'header.h']]],
+  ['npc_5fslash_5frows_13',['NPC_SLASH_ROWS',['../header_8h.html#a11980eec35cd897604f5ef2efa50756a',1,'header.h']]],
+  ['npc_5fvisual_5fground_5foffset_14',['NPC_VISUAL_GROUND_OFFSET',['../header_8h.html#a2632fa0986dde1d7fd1962dd24ac34d7',1,'header.h']]],
+  ['npc_5fwalk_5fcols_15',['NPC_WALK_COLS',['../header_8h.html#aa1d95e8172258012c12022f9055b6d74',1,'header.h']]],
+  ['npc_5fwalk_5fright_5frow_16',['NPC_WALK_RIGHT_ROW',['../header_8h.html#a511520733b01f2785f048fb679206b6b',1,'header.h']]],
+  ['npc_5fwalk_5frows_17',['NPC_WALK_ROWS',['../header_8h.html#a004c0d62e1791ec072b143bf75a0aa43',1,'header.h']]],
+  ['npcbasegroundy_18',['npcBaseGroundY',['../source_8c.html#a76453d9342ec44443c8b3cc4f7beadbc',1,'source.c']]],
+  ['npccanseeplayer_19',['npccanseeplayer',['../source_8c.html#ae334957ecee52909a472197cf6c2b10c',1,'npcCanSeePlayer(NPC *npc, Joueur *player):&#160;source.c'],['../header_8h.html#ae334957ecee52909a472197cf6c2b10c',1,'npcCanSeePlayer(NPC *npc, Joueur *player):&#160;source.c']]],
+  ['npccount_20',['npcCount',['../structSaveData.html#ae39c3e4c415a63973b8a87d6a00b773c',1,'SaveData']]],
+  ['npcplatformfloory_21',['npcPlatformFloorY',['../source_8c.html#adad9047bfa981337cf5b6af3d90b4a3c',1,'source.c']]],
+  ['npcs_22',['npcs',['../structSaveData.html#ac2bfb3b4a592da33dd1c456c84792c1c',1,'SaveData']]]
 ];

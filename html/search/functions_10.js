@@ -1,0 +1,9 @@
+var searchData=
+[
+  ['update_5fminimap_0',['update_minimap',['../minimap_8c.html#a429aca8eb67968c9fb2f223c15f76d2f',1,'update_minimap(Minimap *m, SDL_Rect playerPos, SDL_Rect cam):&#160;minimap.c'],['../minimap_8h.html#a429aca8eb67968c9fb2f223c15f76d2f',1,'update_minimap(Minimap *m, SDL_Rect playerPos, SDL_Rect cam):&#160;minimap.c']]],
+  ['update_5fplatforms_1',['update_platforms',['../background_8c.html#a48ed93f61b5462be5e76666802217807',1,'update_platforms(Background *bg):&#160;background.c'],['../background_8h.html#a48ed93f61b5462be5e76666802217807',1,'update_platforms(Background *bg):&#160;background.c']]],
+  ['update_5ftimer_2',['update_timer',['../background_8c.html#aad8db83b0e69129a30d2c179cfe5d343',1,'update_timer(GameTimer *t):&#160;background.c'],['../background_8h.html#aad8db83b0e69129a30d2c179cfe5d343',1,'update_timer(GameTimer *t):&#160;background.c']]],
+  ['updatebullets_3',['updatebullets',['../header_8h.html#a02ace028e47656f889ef48a8e0a72513',1,'updateBullets(Bullet bullets[], int size):&#160;joueur.c'],['../joueur_8c.html#a02ace028e47656f889ef48a8e0a72513',1,'updateBullets(Bullet bullets[], int size):&#160;joueur.c']]],
+  ['updatejoueur_4',['updatejoueur',['../header_8h.html#a1ccdb9b280fab5cd4ad9aaa764d068c1',1,'updateJoueur(Joueur *J, Uint32 now):&#160;joueur.c'],['../joueur_8c.html#a1ccdb9b280fab5cd4ad9aaa764d068c1',1,'updateJoueur(Joueur *J, Uint32 now):&#160;joueur.c']]],
+  ['updatenpc_5',['updatenpc',['../header_8h.html#a4f60dcde25f40a14c1ffcb33b7ad0e8e',1,'updateNPC(NPC *npc, Joueur *player, int swarmAlerted, SDL_Rect stablePlatforms[], int stableCount, SDL_Rect movingPlatforms[], int movingCount):&#160;source.c'],['../source_8c.html#a4f60dcde25f40a14c1ffcb33b7ad0e8e',1,'updateNPC(NPC *npc, Joueur *player, int swarmAlerted, SDL_Rect stablePlatforms[], int stableCount, SDL_Rect movingPlatforms[], int movingCount):&#160;source.c']]]
+];

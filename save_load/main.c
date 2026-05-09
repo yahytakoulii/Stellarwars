@@ -32,11 +32,12 @@ void run_save_load_menu() {
     SDL_Event event;
     int currentPage = 0;
     while(running) {
+        renderMenu(renderer, &buttons, background, textTexture, textRect, currentPage);
+
         while(SDL_PollEvent(&event)) {
             if(event.type == SDL_QUIT) running = 0;
             handleMenuEvents(&event, &buttons, &currentPage, hoverSound);
         }
-        renderMenu(renderer, &buttons, background, textTexture, textRect, currentPage);
     }
     SDL_DestroyTexture(background);
     SDL_DestroyTexture(textTexture);

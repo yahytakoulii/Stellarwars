@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['platform_117',['Platform',['../structPlatform.html',1,'']]]
+  ['highscore_0',['Highscore',['../structHighscore.html',1,'']]]
 ];

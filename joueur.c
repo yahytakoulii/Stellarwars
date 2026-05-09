@@ -124,11 +124,14 @@ static Animation *getCurrentAnimation(Joueur *J)
     {
         case STATE_JUMP:
             return &J->jump;
+        case STATE_FALL:
+            return &J->fall;
         case STATE_FIRE:
             return &J->fire;
         case STATE_DIE:
             return &J->die;
         case STATE_IDLE:
+            return &J->idle;
         case STATE_WALK:
         default:
             return &J->walk;
@@ -156,6 +159,9 @@ static void setPlayerState(Joueur *J, PlayerState state)
         case STATE_JUMP:
             J->frameDelay = 105;
             break;
+        case STATE_FALL:
+            J->frameDelay = 105;
+            break;
         case STATE_FIRE:
             J->frameDelay = 85;
             break;
@@ -167,19 +173,61 @@ static void setPlayerState(Joueur *J, PlayerState state)
 
 int initialiserJoueur(Joueur *J, SDL_Renderer *renderer, int x, int y)
 {
+    PlayerAssets assets;
+
+    assets.idle = PLUTO_IDLE_PATH;
+    assets.walk = PLUTO_WALK_PATH;
+    assets.jump = PLUTO_JUMP_PATH;
+    assets.fall = PLUTO_FALL_PATH;
+    assets.fire = PLUTO_FIRE_PATH;
+    assets.die = PLUTO_DIE_PATH;
+    assets.portrait = "assets/characters/joueur1/orange/portrait.png";
+    assets.characterName = "Joueur 1";
+    assets.outfitName = "Combinaison orange";
+
+    return initialiserJoueurAvecAssets(J, renderer, x, y, &assets);
+}
+
+int initialiserJoueurAvecAssets(Joueur *J, SDL_Renderer *renderer, int x, int y,
+                                const PlayerAssets *assets)
+{
     memset(J, 0, sizeof(Joueur));
 
-    if (!chargerAnimation(&J->walk, renderer, "assets_pluto/walk.png", PLUTO_WALK_ROWS, PLUTO_WALK_COLS))
+    if (assets == NULL)
         return 0;
 
-    if (!chargerAnimation(&J->jump, renderer, "assets_pluto/jump.png", PLUTO_JUMP_ROWS, PLUTO_JUMP_COLS))
+    if (!chargerAnimation(&J->idle, renderer, assets->idle, PLUTO_IDLE_ROWS, PLUTO_IDLE_COLS))
         return 0;
 
-    if (!chargerAnimation(&J->fire, renderer, "assets_pluto/fire.png", PLUTO_FIRE_ROWS, PLUTO_FIRE_COLS))
+    if (!chargerAnimation(&J->walk, renderer, assets->walk, PLUTO_WALK_ROWS, PLUTO_WALK_COLS))
+    {
+        libererJoueur(J);
         return 0;
+    }
 
-    if (!chargerAnimation(&J->die, renderer, "assets_pluto/die.png", PLUTO_DIE_ROWS, PLUTO_DIE_COLS))
+    if (!chargerAnimation(&J->jump, renderer, assets->jump, PLUTO_JUMP_ROWS, PLUTO_JUMP_COLS))
+    {
+        libererJoueur(J);
         return 0;
+    }
+
+    if (!chargerAnimation(&J->fall, renderer, assets->fall, PLUTO_FALL_ROWS, PLUTO_FALL_COLS))
+    {
+        libererJoueur(J);
+        return 0;
+    }
+
+    if (!chargerAnimation(&J->fire, renderer, assets->fire, PLUTO_FIRE_ROWS, PLUTO_FIRE_COLS))
+    {
+        libererJoueur(J);
+        return 0;
+    }
+
+    if (!chargerAnimation(&J->die, renderer, assets->die, PLUTO_DIE_ROWS, PLUTO_DIE_COLS))
+    {
+        libererJoueur(J);
+        return 0;
+    }
 
     J->posScreen.x = x;
     J->posScreen.y = y;
@@ -213,8 +261,10 @@ int initialiserJoueur(Joueur *J, SDL_Renderer *renderer, int x, int y)
 
 void libererJoueur(Joueur *J)
 {
+    libererAnimation(&J->idle);
     libererAnimation(&J->walk);
     libererAnimation(&J->jump);
+    libererAnimation(&J->fall);
     libererAnimation(&J->fire);
     libererAnimation(&J->die);
 }
@@ -229,25 +279,23 @@ void gererEntreeJoueurClavier(Joueur *J, const Uint8 *keys,
     J->moveLeft = 0;
     J->moveRight = 0;
 
-    if ((keys[left] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_A]) &&
-        !(keys[right] || keys[SDL_SCANCODE_D]))
+    if (keys[left] && !keys[right])
     {
         J->moveLeft = 1;
         J->facing = FACE_LEFT;
     }
-    else if ((keys[right] || keys[SDL_SCANCODE_D]) &&
-             !(keys[left] || keys[SDL_SCANCODE_Q] || keys[SDL_SCANCODE_A]))
+    else if (keys[right] && !keys[left])
     {
         J->moveRight = 1;
         J->facing = FACE_RIGHT;
     }
 
-    if ((keys[jumpKey] || keys[SDL_SCANCODE_Z]) && !J->jumpHeld)
+    if (keys[jumpKey] && !J->jumpHeld)
     {
         lancerSaut(J);
         J->jumpHeld = 1;
     }
-    else if (!keys[jumpKey] && !keys[SDL_SCANCODE_Z])
+    else if (!keys[jumpKey])
         J->jumpHeld = 0;
 }
 
@@ -304,6 +352,8 @@ void updateJoueur(Joueur *J, Uint32 now)
                         setPlayerState(J, STATE_IDLE);
                 }
             }
+            else if (J->velY > 0.0f && J->state != STATE_FIRE)
+                setPlayerState(J, STATE_FALL);
         }
         else
         {
@@ -337,7 +387,14 @@ void updateJoueur(Joueur *J, Uint32 now)
             {
                 J->currentFrame = 0;
 
-                if (J->alive && !J->isJumping)
+                if (J->alive && J->isJumping)
+                {
+                    if (J->velY > 0.0f)
+                        setPlayerState(J, STATE_FALL);
+                    else
+                        setPlayerState(J, STATE_JUMP);
+                }
+                else if (J->alive)
                 {
                     if (J->moveLeft || J->moveRight)
                         setPlayerState(J, STATE_WALK);

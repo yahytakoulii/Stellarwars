@@ -1,5 +1,27 @@
 var searchData=
 [
-  ['rect_197',['rect',['../structPlatform.html#ad556a4d782572800855723ced196cadd',1,'Platform::rect()'],['../structBullet.html#addc6dd4fce8e6202e68c6e539ab4eac5',1,'Bullet::rect()']]],
-  ['rows_198',['rows',['../structAnimation.html#a33b85e3af623bbdecaa2e3fb66bbffc5',1,'Animation']]]
+  ['p1characterindex_0',['p1CharacterIndex',['../structCharacterSelection.html#a7bb7afd7a0a79c80f2bbc22445ecd6c6',1,'CharacterSelection']]],
+  ['p1outfitindex_1',['p1OutfitIndex',['../structCharacterSelection.html#aacf15ed1fa602bf9275288ba50459c59',1,'CharacterSelection']]],
+  ['p2characterindex_2',['p2CharacterIndex',['../structCharacterSelection.html#a1b1b643dc6a56bb31d0a4ec1e80cccfa',1,'CharacterSelection']]],
+  ['p2outfitindex_3',['p2OutfitIndex',['../structCharacterSelection.html#abf300ae977a5c3d2d98ddaf3dc27a31c',1,'CharacterSelection']]],
+  ['path_4',['path',['../structSaveEntry.html#af2d0834fac3717e61f242e92d5f2820a',1,'SaveEntry']]],
+  ['pieces_5',['pieces',['../structGameContext.html#a616369f619bed1fc0fae7813e34df71a',1,'GameContext']]],
+  ['placed_6',['placed',['../structPiece.html#a572233724cef3023be12e227662a1a87',1,'Piece']]],
+  ['platformcount_7',['platformCount',['../structBackground.html#a1f088855977282744046d9f7b3f5be89',1,'Background']]],
+  ['platforms_8',['platforms',['../structBackground.html#a145f5dc271d851b2329ad07c6be00fee',1,'Background']]],
+  ['playername_9',['playerName',['../structHighscore.html#a4e6eb8ddb6d549fbd5c3a318c434610b',1,'Highscore']]],
+  ['playerscore_10',['playerScore',['../structHighscore.html#a51af98c637a8b260a786c50948dcaecd',1,'Highscore']]],
+  ['portrait_11',['portrait',['../structPlayerAssets.html#a22dfb585474402daab386161a3145f32',1,'PlayerAssets']]],
+  ['pos_12',['pos',['../structButton.html#ac930fb7573ba6729c3bda7bb43eb1448',1,'Button::pos'],['../structPlayer.html#a8f4ab33d4123e6268970d9482f93a335',1,'Player::pos'],['../structEnemy.html#ab5abf403ad6178b1046732d9df2db0c1',1,'Enemy::pos'],['../structMinimap.html#a2a8fe0953277644fd32f053cc7d6374b',1,'Minimap::pos']]],
+  ['posback1_13',['posBack1',['../structBackground.html#ae809771cc16bc8f52896c34f2cbd5f5c',1,'Background']]],
+  ['posback2_14',['posBack2',['../structBackground.html#ac849b723115bc912ca08003db62d2e94',1,'Background']]],
+  ['posman_15',['posMan',['../structMinimap.html#a708d44937fe3d068745de75d39621869',1,'Minimap']]],
+  ['posmax_16',['posmax',['../structNPC.html#adbaef81118d95e13339bcdd34dd984d3',1,'NPC::posMax'],['../structSavedNPC.html#afb7060ea09ea76053123d4e7f7bc2226',1,'SavedNPC::posMax']]],
+  ['posmin_17',['posmin',['../structNPC.html#ac5a50d2cd6bc0a16d184ca72622c0974',1,'NPC::posMin'],['../structSavedNPC.html#a02c28da59367614e6cf01593b10fb5b0',1,'SavedNPC::posMin']]],
+  ['posscreen_18',['posscreen',['../structJoueur.html#a8a2a29df8fdbe66c2bc42b3d32d4c16e',1,'Joueur::posScreen'],['../structSavedPlayer.html#a50032b8ca95605273a91580d59455376',1,'SavedPlayer::posScreen']]],
+  ['posscreen1_19',['posScreen1',['../structBackground.html#a5c48d355cb198042c6ed246c5647ea0e',1,'Background']]],
+  ['posscreen2_20',['posScreen2',['../structBackground.html#aa623df1ecd4f7f366bd859528c5ddad7',1,'Background']]],
+  ['possprite_21',['possprite',['../structJoueur.html#abb594e5574c0151d3d527f25a088e388',1,'Joueur::posSprite'],['../structSavedPlayer.html#a39361e67d9c5dab62252126dccb3231f',1,'SavedPlayer::posSprite']]],
+  ['posyfloat_22',['posyfloat',['../structJoueur.html#a22ef352a127a99ba352872649f14549a',1,'Joueur::posYFloat'],['../structSavedPlayer.html#ab4b46ad18b0136d445bc2a23519a5dca',1,'SavedPlayer::posYFloat']]],
+  ['puzzlechallengeused_23',['puzzleChallengeUsed',['../structSaveData.html#af7c7ad7041b95a08d2df2995598c36c5',1,'SaveData']]]
 ];

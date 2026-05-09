@@ -15,7 +15,8 @@ int save_game_state(const char *path,
                     SDL_Rect stablePlatforms[], int stableCount,
                     SDL_Rect movingPlatforms[], int movingCount,
                     int movingDir[], int movingMin[], int movingMax[],
-                    int joueurActif, int puzzleChallengeUsed);
+                    int joueurActif, int puzzleChallengeUsed,
+                    int multiplayerMode);
 int load_game_state(const char *path,
                     Joueur *J1, Joueur *J2,
                     Bullet bullets[], int bulletCount,
@@ -23,7 +24,8 @@ int load_game_state(const char *path,
                     SDL_Rect stablePlatforms[], int stableCount,
                     SDL_Rect movingPlatforms[], int movingCount,
                     int movingDir[], int movingMin[], int movingMax[],
-                    int *joueurActif, int *puzzleChallengeUsed);
+                    int *joueurActif, int *puzzleChallengeUsed,
+                    int *multiplayerMode);
 int prompt_select_save(SDL_Renderer *renderer, TTF_Font *font, char *path, int pathSize);
 int prompt_save_game(SDL_Renderer *renderer, TTF_Font *font);
 int prompt_save_name(SDL_Renderer *renderer, TTF_Font *font, char *name, int nameSize);

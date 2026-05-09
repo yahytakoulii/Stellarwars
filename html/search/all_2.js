@@ -1,6 +1,25 @@
 var searchData=
 [
-  ['check_5fbutton_5fhover_12',['check_button_hover',['../background_8c.html#a9f548ceb76ebaf8906b42bfe7ed82931',1,'check_button_hover(Button *btn, int mx, int my):&#160;background.c'],['../background_8h.html#a9f548ceb76ebaf8906b42bfe7ed82931',1,'check_button_hover(Button *btn, int mx, int my):&#160;background.c']]],
+  ['cardpanel_0',['cardPanel',['../structUiAssets.html#a1fada13494e0c2f1da663bbc10dbde2a',1,'UiAssets']]],
+  ['character_5fselect_2ec_1',['character_select.c',['../character__select_8c.html',1,'']]],
+  ['characterdefinition_2',['CharacterDefinition',['../structCharacterDefinition.html',1,'']]],
+  ['charactername_3',['characterName',['../structPlayerAssets.html#a930511c8cc2b45952b222caadf5011d3',1,'PlayerAssets']]],
+  ['characters_4',['characters',['../character__select_8c.html#a6dc2730fbb3cfb3c415c017b43bc3080',1,'character_select.c']]],
+  ['characterselection_5',['CharacterSelection',['../structCharacterSelection.html',1,'']]],
+  ['chargeranimation_6',['chargerAnimation',['../joueur_8c.html#a67acc0ad2af85ccf4337d9535bf1f27e',1,'joueur.c']]],
+  ['check_5fbutton_5fhover_7',['check_button_hover',['../background_8h.html#a9f548ceb76ebaf8906b42bfe7ed82931',1,'check_button_hover(Button *btn, int mx, int my):&#160;background.c'],['../background_8c.html#a9f548ceb76ebaf8906b42bfe7ed82931',1,'check_button_hover(Button *btn, int mx, int my):&#160;background.c']]],
+  ['check_5fcollision_5faabb_8',['check_collision_aabb',['../minimap_8c.html#ae7f831a76765d062fc78a5969036d1be',1,'check_collision_aabb(SDL_Rect a, SDL_Rect b):&#160;minimap.c'],['../minimap_8h.html#ae7f831a76765d062fc78a5969036d1be',1,'check_collision_aabb(SDL_Rect a, SDL_Rect b):&#160;minimap.c']]],
+  ['check_5fcollision_5fpixel_9',['check_collision_pixel',['../minimap_8c.html#a1338046c912cec175956f14bdffad1e0',1,'check_collision_pixel(SDL_Rect pj, SDL_Surface *mask, int direction):&#160;minimap.c'],['../minimap_8h.html#a1338046c912cec175956f14bdffad1e0',1,'check_collision_pixel(SDL_Rect pj, SDL_Surface *mask, int direction):&#160;minimap.c']]],
+  ['check_5fhover_10',['check_hover',['../highscore_8c.html#aadbec37de25cf24ae92c1d6048b50fd1',1,'check_hover(Button *btn, int mx, int my, Mix_Chunk *hoverSound):&#160;highscore.c'],['../highscore_8h.html#aadbec37de25cf24ae92c1d6048b50fd1',1,'check_hover(Button *btn, int mx, int my, Mix_Chunk *hoverSound):&#160;highscore.c']]],
+  ['chevauchehorizontalement_11',['chevaucheHorizontalement',['../main_8c.html#a8538498286de7a4812520949827c1d1e',1,'main.c']]],
+  ['collisionaabb_12',['collisionaabb',['../header_8h.html#aa9e9ba41bc612f37fd0ff05b55886b49',1,'collisionAABB(SDL_Rect a, SDL_Rect b):&#160;source.c'],['../source_8c.html#aa9e9ba41bc612f37fd0ff05b55886b49',1,'collisionAABB(SDL_Rect a, SDL_Rect b):&#160;source.c']]],
   ['cols_13',['cols',['../structAnimation.html#a3a32d05a559da6331eb03f5771297e6f',1,'Animation']]],
-  ['currentframe_14',['currentFrame',['../structJoueur.html#a5dddcd72418ab3daec570f5e56143345',1,'Joueur']]]
+  ['copy_5fnpc_5fto_5fsave_14',['copy_npc_to_save',['../save__system_8c.html#aff97350dc1b7ea939856e4de4ffba671',1,'save_system.c']]],
+  ['copy_5fplayer_5fto_5fsave_15',['copy_player_to_save',['../save__system_8c.html#a5b418a4e7aeedcf8b67a0bb171a2b604',1,'save_system.c']]],
+  ['copy_5fsave_5fto_5fnpc_16',['copy_save_to_npc',['../save__system_8c.html#afa0e7dad37d43ed4c858c46a7f7496d2',1,'save_system.c']]],
+  ['copy_5fsave_5fto_5fplayer_17',['copy_save_to_player',['../save__system_8c.html#a106b731efad938aa3c0b276c3a33750c',1,'save_system.c']]],
+  ['correct_18',['correct',['../structPiece.html#ab8f8696e6d9d7d6a5b68368c2a16f70c',1,'Piece']]],
+  ['correct_5findex_19',['correct_index',['../structGameContext.html#addfe8b79075c74a3f43e89e8eb843206',1,'GameContext']]],
+  ['crop_5fpiece_20',['crop_piece',['../game_8c.html#ade37127bdc70d21ea3dd261205f27283',1,'game.c']]],
+  ['currentframe_21',['currentframe',['../structJoueur.html#a5dddcd72418ab3daec570f5e56143345',1,'Joueur::currentFrame'],['../structSavedPlayer.html#a04761e821136c80901edefe86177d208',1,'SavedPlayer::currentFrame']]]
 ];
